@@ -1,0 +1,13 @@
+python -m venv my-venv
+
+pip install numpy
+
+
+struc field{
+    player:X1,X2,O1,02,null
+    home:O1,O2,X1,X2,null
+    hwall:1,0
+    vwall:1,0
+} 
+
+field[][]
