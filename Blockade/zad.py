@@ -1,8 +1,9 @@
-from coordinates import GridCoordinates 
+from coordinates import GridCoordinates
+import re 
 
 def initialState(
-    table_width=11,
-    table_length=14,    
+    table_width=14,
+    table_length=11,    
     position_x=(GridCoordinates(4,4),GridCoordinates(8,4)),
     position_o=(GridCoordinates(4,11),GridCoordinates(8,11)),
     walls = 9
@@ -24,45 +25,75 @@ def initialState(
     }
     return (state)
 
-def stateToString(width, length):
+def initialString(width, length):
+
+    x=1
+    y=1
 
     gameStr= ' '
-    for a in range(1,width+2):
+    for a in range(1,width+1):
         gameStr +=' ' + hex(a)[2:].upper()
 
     gameStr+= '\n  '
 
-    for a in range(state['table_width+1):
+    for a in range(width):
         gameStr +='= '
     gameStr+= '\n'
 
-    for a in range(1,state['table_length']+2):
+    for a in range(1,length+2):
         gameStr += hex(a)[2:].upper() +'ǁ'    
-        for b in range(state['table_width']):
-            gameStr += ' ' + '|'        
-        gameStr += ' ǁ'+hex(a)[2:].upper()+'\n'  
-        if a == state['table_length'] : break
+        for b in range(width):            
+            gameStr += f'({a},{b+1})'
+            if b==width-1:break
+            gameStr +='|'       
+        gameStr += 'ǁ'+hex(a)[2:].upper()+'\n'  
+        if a == length : break
         gameStr+= '  '    
-        for a in range(state['table_width']+1):
-            gameStr +='\u2015 '
+        for h in range(width):
+            gameStr +=f'h{a},{h+1}\u2015 '
         gameStr+= '\n'
 
     gameStr +='  '
-    for a in range(state['table_width']+1):
+    for a in range(width):
         gameStr +='= '
 
     gameStr+= '\n '
-    for a in range(1,state['table_width']+2):
+    for a in range(1,width+1):
         gameStr +=' ' + hex(a)[2:].upper()
 
     return gameStr 
 
-def tebleString(width,height):
+def tableString(state):
+
+    gameStr = initialString(state['table_width'],state['table_length'])
+
+    for x in state['position_x']:   
+        gameStr=re.sub(f'\({x}\)','X',gameStr) 
+
+    for o in state['position_o']:
+        gameStr=re.sub(f'\({o}\)','O',gameStr)
+
+    for hw in state['h_walls']:
+        gameStr=re.sub(f'h{hw}\u2015','=',gameStr)
+        gameStr=re.sub(f'h{hw.col},{hw.row+1}\u2015','=',gameStr)
+   
+    for vw in state['v_walls']:
+        gameStr=re.sub(f'\({vw}\)\|',' ǁ',gameStr)
+        gameStr=re.sub(f'\({vw.col+1},{vw.row}\)\|',' ǁ',gameStr)      
+
+        
+    gameStr = re.sub('\([0-9]*,[0-9]*\)', ' ', gameStr)
+    gameStr = re.sub('h[0-9]*,[0-9]*', '', gameStr)
+
+    return gameStr
 
 
 state = initialState()
 
-print(stateToString(state))
+state['h_walls']+=(GridCoordinates(7,6),GridCoordinates(9,8))
+state['v_walls']+=(GridCoordinates(7,7),GridCoordinates(9,10))
+
+print(tableString(state))
 
 
 
