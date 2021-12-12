@@ -9,7 +9,6 @@ def initialState(
     home_o=(GridCoordinates(4,11),GridCoordinates(8,11)),
     walls = 9
 ):
-
     state ={
         'table_width': table_width,
         'table_length': table_length,
@@ -91,8 +90,7 @@ def tableString(state):
 
 
 def getValidMoves(state,pawn): #[X 1] [6 3] [V 4 9] stanje i poziciju pesaka
-        
-
+    
     possible_moves = {
         pawn.top().left(),
         pawn.top().right(),
@@ -212,17 +210,21 @@ def checkPositionForWall (state, position, wall): # 'V' 'H'
 
 def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
 
-    if  not re.match('\[[XO] [12]\] \[[0-9]* [0-9]*\] \[[VH] [0-9]* [0-9]*\]',move):
-        return 'pogresan format poteza'
-             
+    if  not re.match('\[[XO] [12]\] \[[0-9][0-9]* [0-9][0-9]*\] \[[VH] [0-9][0-9]* [0-9][0-9]*\]',move):
+        return 'pogresan format poteza'     
 
-    pawn=move[1] + move[3]
-    step=GridCoordinates(int(move[7]), int(move[9]))
-    wall_kind=move[13]
-    wall_coor=GridCoordinates(int(move[15]),int(move[17]))    
+    steprow=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VH] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(1)
+    stepcol=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VH] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(2)
+    wallrow=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VH] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(3)
+    wallcol=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VH] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(4)
+    
+    p=re.search('\[([XO]) ([0-9][0-9]*)\]', move).group(1)
+    n=re.search('\[([XO]) ([0-9][0-9]*)\]', move).group(2)          
 
-    print(pawn)
-    print(step)    
+    pawn=p+n
+    step=GridCoordinates(int(steprow), int(stepcol))
+    wall_kind=re.search('\[([VH]) [0-9][0-9]* [0-9][0-9]*\]', move).group(1)
+    wall_coor=GridCoordinates(int(wallrow),int(wallcol))       
 
     #postavljanje i provera zida
 
@@ -276,7 +278,20 @@ def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
     else:
         return f'Korak pesaka {pawn} nije validan'
 
-    return 'Izvrsen je potez:'+move    
+    return 'Izvrsen je potez:'+move
+
+def is_end(state):
+    if (state['position_x'][0]==state['home_o'][0] or 
+        state['position_x'][1]==state['home_o'][0] or
+        state['position_x'][0]==state['home_o'][1] or
+        state['position_x'][1]==state['home_o'][1]):
+            return 'Pobedio je igrac X'
+    if (state['position_o'][0]==state['home_x'][0] or 
+        state['position_o'][1]==state['home_x'][0] or
+        state['position_o'][0]==state['home_x'][1] or
+        state['position_o'][1]==state['home_x'][1]):
+            return 'Pobedio je igrac O' 
+    return 'Sledeci potez'   
 
 def game():
 
@@ -290,58 +305,42 @@ def game():
         state = initialState()
     if a=='n':
         print('Unesi sirinu table paran broj do 28')
-        table_width = input()
+        table_width = int(input())
         print('Unesi duzinu table neparan broj do 21')
-        table_length = input()
+        table_length = int(input())
         print('Unesi pocetne pozicije za X')
-        home_x
+        home_x=()
+        for i in range(2):
+            row=int(input())
+            col=int(input())
+            home_x+=(GridCoordinates(row,col),)
+        print('Unesi pocetne pozicije za O')
+        home_o=()
+        for i in range(2):
+            row=int(input())
+            col=int(input())
+            home_o+=(GridCoordinates(row,col),)
+        print('Unesi broj zidova svakog tipa po igracu max 18')
+        walls=int(input())    
         state = initialState(table_width,table_length,home_x,home_o,walls)
-
-
     
+    print(tableString(state))
+
+    a=3
+    while a>0:
+        print('Igrac X je na potezu!')
+        print('Unesi potez u formatu \n [igrac brpesaka] [korak] [vrstazid pozyida] \n')
+        move=input()
+        print(makeAMove(state, move))
+        print(is_end(state))
+        print(tableString(state))
+        print('Igrac O je na potezu!')
+        print('Unesi potez u formatu \n [igrac brpesaka] [korak] [vrstazid pozyida] \n')
+        move=input()
+        print(makeAMove(state, move))
+        print(is_end(state))
+        print(tableString(state))
+        a-=1
+
 
 game()
-
-    
-
-
-
-#state = initialState()
-
-#state['h_walls']+=(GridCoordinates(8,11),GridCoordinates(4,8),GridCoordinates(5,8))
-#state['v_walls']+=(GridCoordinates(7,2),GridCoordinates(8,4))
-#state['position_x'][1].set(8,9)
-#state['position_o'][1].set(6,9)
-
- 
-#print(makeAMove(state,'[X 2] [6 4] [H 5 6]'))
-#makeAMove(state,'[X 2] [5 6] [V 1 7]')
-#state['h_walls_x']=0
-#print(makeAMove(state,'[X 2] [4 5] [H 6 11]'))
-#print(checkPositionForWall(state,GridCoordinates(9,4,),'H'))
-#print(tableString(state))
-              
-
-
-
-
-
-
-
-#for a in Table['h_walls']:print(a)
-
-#print(len(Table['h_walls'])+len(Table['v_walls']))
-
-#Table['h_walls']+=(GridCoordinates(4,3),)
-
-#for a in Table['h_walls']:print(a)
-
-#print(len(Table['h_walls'])+len(Table['v_walls']))
-
-#print(Table['position_x'])
-
-#Table['position_x'] = GridCoordinates(5,3)
-
-#print(Table['position_x'])
-
-#print(Table['position_x']!=Table['position_o'])
