@@ -28,34 +28,34 @@ def initialString(width, length):
 
     gameStr= ' '
     for a in range(1,width+1):
-        gameStr +=' ' + hex(a)[2:].upper()
+        gameStr +='  ' + hex(a)[2:].upper() +' '
 
     gameStr+= '\n  '
 
     for a in range(width):
-        gameStr +='= '
+        gameStr +=' =  '
     gameStr+= '\n'
 
     for a in range(1,length+2):
         gameStr += hex(a)[2:].upper() +'ǁ'    
         for b in range(width):            
-            gameStr += f'({a},{b+1})'
+            gameStr += f' ({a},{b+1}) '
             if b==width-1:break
             gameStr +='|'       
         gameStr += 'ǁ'+hex(a)[2:].upper()+'\n'  
         if a == length : break
-        gameStr+= '  '    
+        gameStr+= '   '    
         for h in range(width):
-            gameStr +=f'h{a},{h+1}\u2015 '
+            gameStr +=f'h{a},{h+1}\u2015   '
         gameStr+= '\n'
 
     gameStr +='  '
     for a in range(width):
-        gameStr +='= '
+        gameStr +=' =  '
 
     gameStr+= '\n '
     for a in range(1,width+1):
-        gameStr +=' ' + hex(a)[2:].upper()
+        gameStr +='  ' + hex(a)[2:].upper() +' '
 
     return gameStr 
 
@@ -74,8 +74,8 @@ def tableString(state):
         gameStr=re.sub(f'h{hw.row},{hw.col+1}\u2015','=',gameStr)
    
     for vw in state['v_walls']:
-        gameStr=re.sub(f'\({vw}\)\|',' ǁ',gameStr)
-        gameStr=re.sub(f'\({vw.row+1},{vw.col}\)\|',' ǁ',gameStr)   
+        gameStr=re.sub(f'\({vw}\) \|','  ǁ',gameStr)
+        gameStr=re.sub(f'\({vw.row+1},{vw.col}\) \|','  ǁ',gameStr)   
         
     gameStr = re.sub('\([0-9]*,[0-9]*\)', ' ', gameStr)
     gameStr = re.sub('h[0-9]*,[0-9]*', '', gameStr)
@@ -144,7 +144,8 @@ state = initialState()
 state['h_walls']+=(GridCoordinates(7,6),GridCoordinates(9,8))
 state['v_walls']+=(GridCoordinates(7,7),GridCoordinates(9,10))
 
-print(isMoveValid(state,'X1','53'))                 
+#print(isMoveValid(state,'X1','53'))  
+print(tableString(state))               
 
 
 
