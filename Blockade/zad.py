@@ -191,12 +191,14 @@ def getValidMoves(state,pawn): #[X 1] [6 3] [V 4 9]
         possible_moves.add(pawn.bottom())
     if pawn.right().right() in state['position_x'] or pawn.right().right() in state['position_o']:
         possible_moves.add(pawn.right())
-       
-                                                       
-    return possible_moves
 
-def makeMove(state, pawn, move):
-    
+    for a in possible_moves:
+        print(a)   
+                                                       
+    return #possible_moves
+
+#def makeMove(state, pawn, move):
+
 
 
 state = initialState()
@@ -207,7 +209,7 @@ state['position_x'][1].set(8,9)
 state['position_o'][1].set(6,9)
 
 print(tableString(state)) 
-print(isMoveValid(state,'X2','53'))  
+print(getValidMoves(state,'X2'))  
               
 
 
