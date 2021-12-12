@@ -63,11 +63,13 @@ def tableString(state):
 
     gameStr = initialString(state['table_width'],state['table_length'])
 
-    for x in state['position_x']:   
-        gameStr=re.sub(f'\({x}\)','X',gameStr) 
+    for x in state['position_x']:
+        i =  state['position_x'].index(x) + 1 
+        gameStr=re.sub(f'\({x}\) ',f'X{i}',gameStr) 
 
     for o in state['position_o']:
-        gameStr=re.sub(f'\({o}\)','O',gameStr)
+        i =  state['position_o'].index(o) + 1
+        gameStr=re.sub(f'\({o}\) ',f'O{i}',gameStr)
 
     for hw in state['h_walls']:
         gameStr=re.sub(f'h{hw}\u2015','=',gameStr)
@@ -94,10 +96,6 @@ def isMoveValid(state,pawn,move): #[X 1] [6 3] [V 4 9]
     pawn = switcher[pawn]    
 
     possible_moves = {
-        pawn.top(),
-        pawn.bottom(),
-        pawn.left(),
-        pawn.right(),
         pawn.top().left(),
         pawn.top().right(),
         pawn.bottom().left(),
@@ -106,27 +104,34 @@ def isMoveValid(state,pawn,move): #[X 1] [6 3] [V 4 9]
         pawn.bottom().bottom(),
         pawn.left().left(),
         pawn.right().right()      
-    }
+    }    
 
-    for a in possible_moves:
-        print(a)
+    #za horizontanlne zidove
 
     if pawn.top().top() in state['h_walls']: 
-        possible_moves-={pawn.top().top()}  
+        possible_moves-={pawn.top().top()}
+        possible_moves.add(pawn.top())  
+    if pawn.bottom() in state['h_walls']:
+        possible_moves-={pawn.bottom().bottom()}
+        possible_moves.add(pawn.bottom())
+    if pawn.bottom().left() in state['h_walls']:
+        possible_moves-={pawn.bottom().bottom()}
+        possible_moves.add(pawn.bottom())
+    if pawn.top().top().left()in state['h_walls']:
+        possible_moves-={pawn.top().top()}
+        possible_moves.add(pawn.bottom())
+
     if pawn.top() in state['h_walls']: 
         possible_moves-={ pawn.top(), pawn.top().right(), pawn.top().top()}        
     if pawn in state['h_walls']:
-        possible_moves-={pawn.bottom(),pawn.bottom().right(),pawn.bottom().bottom()}        
-    if pawn.bottom() in state['h_walls']:
-        possible_moves-={pawn.bottom().bottom()}
+        possible_moves-={pawn.bottom(),pawn.bottom().right(),pawn.bottom().bottom()}    
     if pawn.top().left() in state['h_walls']:
         possible_moves-={pawn.top().top(), pawn.top(), pawn.top().left()}
     if pawn.left() in state['h_walls']:
         possible_moves-={pawn.bottom().bottom(), pawn.bottom().left(), pawn.bottom()}
-    if pawn.bottom().left() in state['h_walls']:
-        possible_moves-={pawn.bottom().bottom()}
-    if pawn.top().top().left()in state['h_walls']:
-        possible_moves-={pawn.top().top()}
+    
+    for a in possible_moves:
+        print(a)
 
 
     #za vertikalne zidove
@@ -141,10 +146,10 @@ def isMoveValid(state,pawn,move): #[X 1] [6 3] [V 4 9]
     return 'fun'
 state = initialState()
 
-state['h_walls']+=(GridCoordinates(7,6),GridCoordinates(9,8))
+state['h_walls']+=(GridCoordinates(9,4),GridCoordinates(8,4),GridCoordinates(6,3))
 state['v_walls']+=(GridCoordinates(7,7),GridCoordinates(9,10))
 
-#print(isMoveValid(state,'X1','53'))  
+print(isMoveValid(state,'X1','53'))  
 print(tableString(state))               
 
 
