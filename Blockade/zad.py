@@ -129,7 +129,7 @@ def isMoveValid(state,pawn,move): #[X 1] [6 3] [V 4 9]
         possible_moves-={pawn.top().top()}
 
 
-
+    #za vertikalne zidove
 
     if pawn.right() in state['v_walls']:
     if pawn in state['v_walls']:
