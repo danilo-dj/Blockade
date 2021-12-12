@@ -8,6 +8,10 @@ class GridCoordinates:
         self.col  = col
         self.row  = row
 
+    def set(self,row,col):
+        self.row=row
+        self.col=col    
+
     def left(self):
         """
         Return the coordinates of the square at left, even if it does not exists
