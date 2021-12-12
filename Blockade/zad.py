@@ -90,15 +90,8 @@ def tableString(state):
     return gameStr
 
 
-def getValidMoves(state,pawn): #[X 1] [6 3] [V 4 9] 
-    switcher = {
-        'X1': state['position_x'][0],
-        'X2': state['position_x'][1],
-        'O1': state['position_o'][0],
-        'O2': state['position_o'][1] 
-    }
-                                            
-    pawn = switcher[pawn]    
+def getValidMoves(state,pawn): #[X 1] [6 3] [V 4 9] stanje i poziciju pesaka
+        
 
     possible_moves = {
         pawn.top().left(),
@@ -226,27 +219,70 @@ def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
     pawn=move[1] + move[3]
     step=GridCoordinates(int(move[7]), int(move[9]))
     wall_kind=move[13]
-    wall_coor=GridCoordinates(int(move[15]),int(move[17]))
+    wall_coor=GridCoordinates(int(move[15]),int(move[17]))    
 
     print(pawn)
-    print(step)
-    print(wall_coor)
-    print(wall_kind)
+    print(step)    
+
+    #postavljanje i provera zida
 
     if checkPositionForWall(state,wall_coor,wall_kind):
         if wall_kind=='H':
-            state['h_walls']+=deepcopy((wall_coor,))
+            if re.match('X[12]',pawn):
+                if state['h_walls_x']>0:
+                    state['h_walls']+=(wall_coor,)
+                    state['h_walls_x']-=1
+                else:
+                    return 'Igrac X nema vise H zidova'    
+            if re.match('O[12]',pawn):
+                if state['h_walls_o']>0:
+                    state['h_walls']+=(wall_coor,)
+                    state['h_walls_o']-=1
+                else:
+                    return 'Igrac O nema vise H zidova'
+            
         if wall_kind=='V':
-            state['v_walls']+=deepcopy((wall_coor,))
+            if re.match('X[12]',pawn):
+                if state['v_walls_x']>0:
+                    state['v_walls']+=(wall_coor,)
+                    state['v_walls_x']-=1
+                else:
+                    return 'Igrac X nema vise V zidova'    
+            if re.match('O[12]',pawn):
+                if state['v_walls_o']>0:
+                    state['v_walls']+=(wall_coor,)
+                    state['v_walls_o']-=1
+                else:
+                    return 'Igrac O nema vise V zidova'
     else:
         return f'Izabrano polje {wall_coor} za zid je zauzeto'
 
 
+    #pomeranje pesaka
 
-    #for a in validMoves:
-    #    print(a)
+    switcher = {
+        'X1': state['position_x'][0],
+        'X2': state['position_x'][1],
+        'O1': state['position_o'][0],
+        'O2': state['position_o'][1] 
+    }
+                                            
+    pawn_pos = switcher[pawn]
 
-    return
+    validMoves = getValidMoves(state,pawn_pos)
+
+    if step in validMoves:
+        switcher[pawn].set(step.row,step.col)
+    else:
+        return f'Korak pesaka {pawn} nije validan'
+
+    return 'Izvrsen je potez:'+move    
+
+def Game():
+    print('')
+
+
+    
 
 
 
@@ -258,9 +294,10 @@ state['v_walls']+=(GridCoordinates(7,2),GridCoordinates(8,4))
 #state['position_o'][1].set(6,9)
 
  
-print(makeAMove(state,'[X 2] [4 5] [H 5 6]'))
+print(makeAMove(state,'[X 2] [6 4] [H 5 6]'))
 makeAMove(state,'[X 2] [5 6] [V 1 7]')
-print(makeAMove(state,'[X 2] [4 5] [H 1 7]'))
+state['h_walls_x']=0
+print(makeAMove(state,'[X 2] [4 5] [H 6 11]'))
 #print(checkPositionForWall(state,GridCoordinates(9,4,),'H'))
 print(tableString(state))
               
