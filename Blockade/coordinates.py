@@ -4,7 +4,7 @@ class GridCoordinates:
     Coordinates on square grid
     """
 
-    def __init__(self, col, row):
+    def __init__(self, row, col):
         self.col  = col
         self.row  = row
 
@@ -12,36 +12,35 @@ class GridCoordinates:
         """
         Return the coordinates of the square at left, even if it does not exists
         """
-        return GridCoordinates(self.col - 1, self.row)
+        return GridCoordinates(self.row, self.col - 1)    
 
     def right(self):
         """
         Return the coordinates of the square at right, even if it does not exists
         """
-        return GridCoordinates(self.col + 1, self.row)
+        return GridCoordinates(self.row,self.col + 1 )
 
     def top(self):
         """
         Return the coordinates of the square at top, even if it does not exists
         """
-        return GridCoordinates(self.col, self.row - 1)
+        return GridCoordinates(self.row - 1,self.col )
 
     def bottom(self):
         """
         Return the coordinates of the square at bottom, even if it does not exists
         """
-        return GridCoordinates(self.col, self.row + 1)
+        return GridCoordinates(self.row + 1, self.col)
 
     def clone(self):
         """
         Return identical coordinates 
         """
-        return GridCoordinates(self.col, self.row)
+        return GridCoordinates(self.row, self.col)
 
     def __eq__(self, other):
         """
-        Override the default Equals behavior.
-        https://stackoverflow.com/questions/390250/elegant-ways-to-support-equivalence-equality-in-python-classes
+        Override the default Equals behavior.        
         """
         if isinstance(other, self.__class__):
             #return self.__dict__ == other.__dict__
@@ -50,8 +49,7 @@ class GridCoordinates:
 
     def __ne__(self, other):
         """
-        Define a non-equality test.
-        https://stackoverflow.com/questions/390250/elegant-ways-to-support-equivalence-equality-in-python-classes
+        Define a non-equality test.        
         """
         if isinstance(other, self.__class__):
             return not self.__eq__(other)
@@ -59,10 +57,9 @@ class GridCoordinates:
 
     def __hash__(self):
         """
-        Override the default hash behavior (that returns the id or the object).
-        https://stackoverflow.com/questions/390250/elegant-ways-to-support-equivalence-equality-in-python-classes
+        Override the default hash behavior (that returns the id or the object).        
         """
         return hash((self.col, self.row))
 
     def __str__(self):
-        return "%d,%d" % (self.col, self.row)
+        return "%d,%d" % (self.row, self.col)

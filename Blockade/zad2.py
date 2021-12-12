@@ -39,7 +39,7 @@ def is_end(state):
         # potez dijagonalno levo
         if end_location[0] == start_location[0] + 1 and end_location[1] == start_location[1] - 1:
             # zidovi
-            if end_location in self.h_walls or end_location in state.v_walls:
+            if end_location in state.h_walls or end_location in state.v_walls:
                 print('Postoji zid na putu')
                 return 0
             else:
@@ -50,3 +50,37 @@ def is_end(state):
 print(state)
 
 print(is_end(state))
+
+
+
+
+
+
+
+   def checkPositionForWall(state, position):
+       for x in range(13)
+       if(position==GridCoordinates(10,x))
+       break
+    print("Mogućnost postavljanja zida ne postoji")
+    for x in range(11)
+       if(position==GridCoordinates(x,13))
+       break
+    print("Mogućnost postavljanja zida ne postoji")
+    res=False
+       for ele in state['h_walls'] :
+           if position == ele :
+               res=True
+               break 
+         print("Mogućnost postavljanja zida ? : " + str(res))
+               res=False
+       for ele in state['v_walls'] :
+           if position == ele :
+               res=True
+               break
+            print("Mogućnost postavljanja zida ? : " + str(res))
+            #treba za susede za horizont i vert ono da se izbaci ta dva slucaja mi fale 
+
+          
+     
+
+
