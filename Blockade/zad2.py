@@ -1,3 +1,4 @@
+from coordinates import GridCoordinates
 import zad
 
 state = zad.initialState()
@@ -29,16 +30,15 @@ def is_end(state):
                 (start_location[0] + 2, start_location[1]) in state.h_walls or \
                 (start_location[0] + 2, start_location[1] -1) in state.h_walls:
 
-                # u ovom slucaju postoji zid negde i nije moguce proci napred
                 print('Postoji zid na putu')
                 return 0
-            else:   # potez je validan
+            else:  
                 print('Potez je validan', end_location)
                 return 1
         
-        # potez dijagonalno levo
+        
         if end_location[0] == start_location[0] + 1 and end_location[1] == start_location[1] - 1:
-            # zidovi
+         
             if end_location in state.h_walls or end_location in state.v_walls:
                 print('Postoji zid na putu')
                 return 0
@@ -57,30 +57,41 @@ print(is_end(state))
 
 
 
-   def checkPositionForWall(state, position):
-       for x in range(13)
-       if(position==GridCoordinates(10,x))
-       break
-    print("Mogućnost postavljanja zida ne postoji")
-    for x in range(11)
-       if(position==GridCoordinates(x,13))
-       break
-    print("Mogućnost postavljanja zida ne postoji")
-    res=False
+def checkPositionForWall (state, position):
+       for x in range(13):
+        if (position==GridCoordinates(10,x)) :
+          break
+        print ("Mogućnost postavljanja zida ne postoji")
+       for x in range(11):
+        if (position==GridCoordinates(x,13)) :
+          break
+        print ("Mogućnost postavljanja zida ne postoji")
+       res=False
        for ele in state['h_walls'] :
-           if position == ele :
+        if position == ele :
                res=True
                break 
-         print("Mogućnost postavljanja zida ? : " + str(res))
+               print ("Mogućnost postavljanja zida ? : " + str(res))
                res=False
        for ele in state['v_walls'] :
-           if position == ele :
+        if position == ele :
                res=True
                break
-            print("Mogućnost postavljanja zida ? : " + str(res))
-            #treba za susede za horizont i vert ono da se izbaci ta dva slucaja mi fale 
+               print ("Mogućnost postavljanja zida ? : " + str(res))
+        
+        
+        for x in state['h_walls'] :    
+            s=len(state[h_walls])
+            for p in range(s) :
+             p=state['h_walls'][position[0]]
+            if state['h_walls'][p][0]==position[0] and state['h_walls'][p][1]==(position[1]+1) :
+             break
+             print("Mogućnost postavljanja zida ne postoji")
 
-          
-     
+            if state['v_walls'][p][1]==position[1] and state['v_walls'][p][0]==(position[0]+1) :
+             break
+             print("Mogućnost postavljanja zida ne postoji")
+
+
 
 
