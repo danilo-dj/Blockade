@@ -131,15 +131,14 @@ def isMoveValid(state,pawn,move): #[X 1] [6 3] [V 4 9]
 
     #za vertikalne zidove
 
-    if pawn.right() in state['v_walls']:
-    if pawn in state['v_walls']:
-    if pawn.left() in state['v_walls']:
-    if pawn.left().left() in state['v_walls']:                 
+    #if pawn.right() in state['v_walls']:
+    #if pawn in state['v_walls']:
+    #if pawn.left() in state['v_walls']:
+    #if pawn.left().left() in state['v_walls']:                 
       
     
                                                        
     return 'fun'
-
 state = initialState()
 
 state['h_walls']+=(GridCoordinates(7,6),GridCoordinates(9,8))
