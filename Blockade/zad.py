@@ -116,6 +116,8 @@ def isMoveValid(state,pawn,move): #[X 1] [6 3] [V 4 9]
         pawn.right()
     }
 
+    #ako je home na jedan korak
+
     for pos in one_step:
         if pos in state['home_x'] or pos in state['home_o']:
             possible_moves.add(pos)   
@@ -158,9 +160,7 @@ def isMoveValid(state,pawn,move): #[X 1] [6 3] [V 4 9]
     if pawn.top().right() in state['v_walls']:
         possible_moves-={pawn.right().right()}
         possible_moves.add(pawn.right())
-
-    #za horizontalne zidove
-
+    
     if pawn.left() in state['v_walls']:
         possible_moves-={pawn.left().left(), pawn.left(), pawn.bottom().left()}
     if pawn in state['v_walls']:
@@ -170,9 +170,14 @@ def isMoveValid(state,pawn,move): #[X 1] [6 3] [V 4 9]
     if pawn.top() in state['v_walls']:
         possible_moves-={pawn.right().right(), pawn.riht(), pawn.top().right()}
 
-    #for pm in possible_moves:
-    #    if pm in state['posision_o']
+    #ako postoji pesak na possible_moves
+    
+    poss_pom = possible_moves.copy()     
 
+    for pm in poss_pom:
+        if (pm in state['position_o'] or pm in state['position_x']) and pm not in state['home_x'] and pm not in state['home_o']:
+            possible_moves-={pm}
+        
 
     for a in possible_moves:
         print(a) 
