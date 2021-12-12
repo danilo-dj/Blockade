@@ -278,28 +278,48 @@ def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
 
     return 'Izvrsen je potez:'+move    
 
-def Game():
-    print('')
+def game():
 
+    print('Ko je prvi na potezu?[covek,racunar](c\\r)?')
+    a=input()
+    print(a)
+
+    print('Da li zelite da igrate sa podrazumevanom tablom?(y\\n)?')
+    a = input()
+    if a=='y':
+        state = initialState()
+    if a=='n':
+        print('Unesi sirinu table paran broj do 28')
+        table_width = input()
+        print('Unesi duzinu table neparan broj do 21')
+        table_length = input()
+        print('Unesi pocetne pozicije za X')
+        home_x
+        state = initialState(table_width,table_length,home_x,home_o,walls)
+
+
+    
+
+game()
 
     
 
 
 
-state = initialState()
+#state = initialState()
 
-state['h_walls']+=(GridCoordinates(8,11),GridCoordinates(4,8),GridCoordinates(5,8))
-state['v_walls']+=(GridCoordinates(7,2),GridCoordinates(8,4))
+#state['h_walls']+=(GridCoordinates(8,11),GridCoordinates(4,8),GridCoordinates(5,8))
+#state['v_walls']+=(GridCoordinates(7,2),GridCoordinates(8,4))
 #state['position_x'][1].set(8,9)
 #state['position_o'][1].set(6,9)
 
  
-print(makeAMove(state,'[X 2] [6 4] [H 5 6]'))
-makeAMove(state,'[X 2] [5 6] [V 1 7]')
-state['h_walls_x']=0
-print(makeAMove(state,'[X 2] [4 5] [H 6 11]'))
+#print(makeAMove(state,'[X 2] [6 4] [H 5 6]'))
+#makeAMove(state,'[X 2] [5 6] [V 1 7]')
+#state['h_walls_x']=0
+#print(makeAMove(state,'[X 2] [4 5] [H 6 11]'))
 #print(checkPositionForWall(state,GridCoordinates(9,4,),'H'))
-print(tableString(state))
+#print(tableString(state))
               
 
 
