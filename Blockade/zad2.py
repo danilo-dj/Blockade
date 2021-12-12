@@ -9,12 +9,12 @@ def is_end(state):
         state['position_x'][1]==state['home_o'][0] or
         state['position_x'][0]==state['home_o'][1] or
         state['position_x'][1]==state['home_o'][1]):
-            print('Pobedio je igrac x')
+            print('Pobedio je igrac X')
     if (state['position_o'][0]==state['home_o'][0] or 
         state['position_o'][1]==state['home_o'][0] or
         state['position_o'][0]==state['home_o'][1] or
         state['position_o'][1]==state['home_o'][1]):
-            print('Pobedio je igrac o')
+            print('Pobedio je igrac O')
     
 
   
@@ -58,22 +58,38 @@ print(is_end(state))
 
 
 def checkPositionForWall (state, position):
-       res=False
-       for ele in state['h_walls'] :
-        if position == ele :
-               res=True
-               break 
-               print ('Mogućnost postavljanja zida ? : ' + str(res))
-               res=False
-       for ele in state['v_walls'] :
-        if position == ele :
-               res=True
-               break
-               print ('Mogućnost postavljanja zida ? : ' + str(res))
+       #res=False
+       for hw in state['h_walls'] :
+        if position == hw :
+               return False
+               #break 
+               #print ('Mogućnost postavljanja zida ? : ' + str(res))
+               #res=False
+       for vw in state['v_walls'] :
+        if position == vw :
+               return False
+               #break
+               #print ('Mogućnost postavljanja zida ? : ' + str(res))
         
         
-        for x in state['h_walls'] :    
-            s=len(state[h_walls])
+        for hw in state['h_walls'] :
+            if position == hw.right():
+                return False
+
+        for vw in state['v_walls'] :
+            if position == vw.bottom():
+                return False 
+
+        if position.col == state['table_width'] or position.row== state['table_length']:
+            return False 
+
+        return True 
+
+
+        state['h_walls'][1].col
+
+        for x in state['h_walls']:
+            s=len(state['h_walls'])
             for p in range(s) :
              p=state['h_walls'][position[0]]
             if state['h_walls'][p][0]==position[0] and state['h_walls'][p][1]==(position[1]+1) :

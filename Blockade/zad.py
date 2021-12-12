@@ -191,13 +191,62 @@ def getValidMoves(state,pawn): #[X 1] [6 3] [V 4 9]
         possible_moves.add(pawn.bottom())
     if pawn.right().right() in state['position_x'] or pawn.right().right() in state['position_o']:
         possible_moves.add(pawn.right())
+                                                           
+    return possible_moves
 
-    for a in possible_moves:
-        print(a)   
-                                                       
-    return #possible_moves
+def checkPositionForWall (state, position, wall): # 'V' 'H'
 
-#def makeMove(state, pawn, move):
+    for hw in state['h_walls']:
+        if hw == position:
+            return False
+
+    for vw in state['v_walls']:
+        if vw == position:
+            return False
+
+    for hw in state['h_walls']:
+        if position == hw.right() and wall =='H':
+            return False
+
+    for vw in state['v_walls']:
+        if position == vw.bottom() and wall =='V':
+            return False 
+
+    if position.col == state['table_width'] or position.row== state['table_length']:
+        return False 
+
+    return True
+
+def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
+
+    if  not re.match('\[[XO] [12]\] \[[0-9]* [0-9]*\] \[[VH] [0-9]* [0-9]*\]',move):
+        return 'pogresan format poteza'
+             
+
+    pawn=move[1] + move[3]
+    step=GridCoordinates(int(move[7]), int(move[9]))
+    wall_kind=move[13]
+    wall_coor=GridCoordinates(int(move[15]),int(move[17]))
+
+    print(pawn)
+    print(step)
+    print(wall_coor)
+    print(wall_kind)
+
+    if checkPositionForWall(state,wall_coor,wall_kind):
+        if wall_kind=='H':
+            state['h_walls']+=deepcopy((wall_coor,))
+        if wall_kind=='V':
+            state['v_walls']+=deepcopy((wall_coor,))
+    else:
+        return f'Izabrano polje {wall_coor} za zid je zauzeto'
+
+
+
+    #for a in validMoves:
+    #    print(a)
+
+    return
 
 
 
@@ -205,11 +254,15 @@ state = initialState()
 
 state['h_walls']+=(GridCoordinates(8,11),GridCoordinates(4,8),GridCoordinates(5,8))
 state['v_walls']+=(GridCoordinates(7,2),GridCoordinates(8,4))
-state['position_x'][1].set(8,9)
-state['position_o'][1].set(6,9)
+#state['position_x'][1].set(8,9)
+#state['position_o'][1].set(6,9)
 
-print(tableString(state)) 
-print(getValidMoves(state,'X2'))  
+ 
+print(makeAMove(state,'[X 2] [4 5] [H 5 6]'))
+makeAMove(state,'[X 2] [5 6] [V 1 7]')
+print(makeAMove(state,'[X 2] [4 5] [H 1 7]'))
+#print(checkPositionForWall(state,GridCoordinates(9,4,),'H'))
+print(tableString(state))
               
 
 
