@@ -61,23 +61,23 @@ def checkPositionForWall (state, position):
        for x in range(13):
         if (position==GridCoordinates(10,x)) :
           break
-        print ("Mogućnost postavljanja zida ne postoji")
+        print ('Mogućnost postavljanja zida ne postoji')
        for x in range(11):
         if (position==GridCoordinates(x,13)) :
           break
-        print ("Mogućnost postavljanja zida ne postoji")
+        print ('Mogućnost postavljanja zida ne postoji')
        res=False
        for ele in state['h_walls'] :
         if position == ele :
                res=True
                break 
-               print ("Mogućnost postavljanja zida ? : " + str(res))
+               print ('Mogućnost postavljanja zida ? : ' + str(res))
                res=False
        for ele in state['v_walls'] :
         if position == ele :
                res=True
                break
-               print ("Mogućnost postavljanja zida ? : " + str(res))
+               print ('Mogućnost postavljanja zida ? : ' + str(res))
         
         
         for x in state['h_walls'] :    
@@ -86,11 +86,11 @@ def checkPositionForWall (state, position):
              p=state['h_walls'][position[0]]
             if state['h_walls'][p][0]==position[0] and state['h_walls'][p][1]==(position[1]+1) :
              break
-             print("Mogućnost postavljanja zida ne postoji")
+             print('Mogućnost postavljanja zida ne postoji')
 
             if state['v_walls'][p][1]==position[1] and state['v_walls'][p][0]==(position[0]+1) :
              break
-             print("Mogućnost postavljanja zida ne postoji")
+             print('Mogućnost postavljanja zida ne postoji')
 
 
 
