@@ -1,20 +1,22 @@
 from coordinates import GridCoordinates
+from copy import deepcopy
 import re 
 
 def initialState(
     table_width=14,
     table_length=11,    
-    position_x=(GridCoordinates(4,4),GridCoordinates(8,4)),
-    position_o=(GridCoordinates(4,11),GridCoordinates(8,11)),
+    home_x=(GridCoordinates(4,4),GridCoordinates(8,4)),
+    home_o=(GridCoordinates(4,11),GridCoordinates(8,11)),
     walls = 9
 ):
+
     state ={
         'table_width': table_width,
         'table_length': table_length,
-        'home_x': position_x,
-        'home_o': position_o,
-        'position_x': position_x,
-        'position_o': position_o,
+        'home_x': home_x,
+        'home_o': home_o,
+        'position_x': deepcopy(home_x),
+        'position_o': deepcopy(home_o),
         'h_walls_x' : walls,
         'h_walls_o' : walls,
         'v_walls_x' : walls,
@@ -88,7 +90,7 @@ def tableString(state):
     return gameStr
 
 
-def isMoveValid(state,pawn,move): #[X 1] [6 3] [V 4 9] 
+def getValidMoves(state,pawn): #[X 1] [6 3] [V 4 9] 
     switcher = {
         'X1': state['position_x'][0],
         'X2': state['position_x'][1],
@@ -170,26 +172,39 @@ def isMoveValid(state,pawn,move): #[X 1] [6 3] [V 4 9]
     if pawn.top() in state['v_walls']:
         possible_moves-={pawn.right().right(), pawn.riht(), pawn.top().right()}
 
-    #ako postoji pesak na possible_moves
+    #ako postoji pesak na possible_moves    
     
-    poss_pom = possible_moves.copy()     
-
-    for pm in poss_pom:
-        if (pm in state['position_o'] or pm in state['position_x']) and pm not in state['home_x'] and pm not in state['home_o']:
-            possible_moves-={pm}
+    for pm in possible_moves.copy():
+        if pm in state['position_o'] or pm in state['position_x']:
+            p=pm in state['position_o'] or pm in state['position_x']
+            if pm not in state['home_x'] and pm not in state['home_o']:
+                c=pm not in state['home_x'] and pm not in state['home_o']
+                possible_moves.remove(pm)
         
+    #u slucaju da su drugi pesaci na krajnjim pozicijama moze da se pomeri za jedan korak   
 
-    for a in possible_moves:
-        print(a) 
-    
+    if pawn.top().top() in state['position_x'] or pawn.top().top() in state['position_o']:
+        possible_moves.add(pawn.top())
+    if pawn.left().left() in state['position_x'] or pawn.left().left() in state['position_o']:
+        possible_moves.add(pawn.left())
+    if pawn.bottom().bottom() in state['position_x'] or pawn.bottom().bottom() in state['position_o']:
+        possible_moves.add(pawn.bottom())
+    if pawn.right().right() in state['position_x'] or pawn.right().right() in state['position_o']:
+        possible_moves.add(pawn.right())
+       
                                                        
-    return 'funend'
+    return possible_moves
+
+def makeMove(state, pawn, move):
+    
+
 
 state = initialState()
 
 state['h_walls']+=(GridCoordinates(8,11),GridCoordinates(4,8),GridCoordinates(5,8))
 state['v_walls']+=(GridCoordinates(7,2),GridCoordinates(8,4))
-state['position_x'][1].set(8,10)
+state['position_x'][1].set(8,9)
+state['position_o'][1].set(6,9)
 
 print(tableString(state)) 
 print(isMoveValid(state,'X2','53'))  
