@@ -1,5 +1,5 @@
 from coordinates import GridCoordinates
-from copy import deepcopy
+from copy import *
 import re 
 
 def initialState(
@@ -16,14 +16,16 @@ def initialState(
         'home_o': home_o,
         'position_x': deepcopy(home_x),
         'position_o': deepcopy(home_o),
-        'h_walls_x' : walls,
-        'h_walls_o' : walls,
-        'v_walls_x' : walls,
+        'h_walls_x' : copy(walls),
+        'h_walls_o' : copy(walls),
+        'v_walls_x' : copy(walls),
         'v_walls_o' : walls,
         'h_walls': (),
         'v_walls': ()
     }
-    return (state)
+    return state
+
+
 
 def initialString(width, length):   
 
@@ -161,7 +163,7 @@ def getValidMoves(state,pawn): #[X 1] [6 3] [V 4 9] stanje i poziciju pesaka
     if pawn.top().left() in state['v_walls']:
         possible_moves-={pawn.left().left(), pawn.left(), pawn.top().left}
     if pawn.top() in state['v_walls']:
-        possible_moves-={pawn.right().right(), pawn.riht(), pawn.top().right()}
+        possible_moves-={pawn.right().right(), pawn.right(), pawn.top().right()}
 
     #ako postoji pesak na possible_moves    
     
@@ -200,7 +202,7 @@ def checkPositionForWall (state, position, wall): # 'V' 'H'
             return False
 
     for vw in state['v_walls']:
-        if position == vw.bottom() and wall =='V':
+        if position == vw.bottom()  and wall =='V':
             return False 
 
     if position.col == state['table_width'] or position.row== state['table_length']:
@@ -285,19 +287,221 @@ def is_end(state):
         state['position_x'][1]==state['home_o'][0] or
         state['position_x'][0]==state['home_o'][1] or
         state['position_x'][1]==state['home_o'][1]):
-            return 'Pobedio je igrac X'
+            print('Pobedio je igrac X')
+            return True
     if (state['position_o'][0]==state['home_x'][0] or 
         state['position_o'][1]==state['home_x'][0] or
         state['position_o'][0]==state['home_x'][1] or
         state['position_o'][1]==state['home_x'][1]):
-            return 'Pobedio je igrac O' 
-    return 'Sledeci potez'   
+            print('Pobedio je igrac O')
+            return True
+    print('Sledeci potez') 
+    return False 
 
+def newState(state, move):
+    pom = deepcopy(state)
+    makeAMove(pom, move)
+    return pom
+
+def possibleStatesOneMove(state, player): # 'X' ili 'O'    
+    #moguce pozicije horizontalnih i vertikalnih zidova na osnovu trenutnog stanja    
+    allCoor = list()
+    for i in range(1,state['table_length']+1):
+            for j in range(1,state['table_width']+1):
+                allCoor.append(GridCoordinates(i,j))
+    possibleHwall = list()
+    possibleVwall = list()
+    for pos in allCoor:
+        if checkPositionForWall(state,pos,'H'):
+            possibleHwall.append(pos)
+        if checkPositionForWall(state,pos,'V'):
+            possibleVwall.append(pos)            
+    #moguce pozicije pojedinacnog piona i broj ostalih zidova
+    validMoves1 = set()
+    validMoves2 = set()
+    if player == 'X':        
+        validMoves1.update(getValidMoves(state,state['position_x'][0]))
+        validMoves2.update(getValidMoves(state, state['position_x'][1]))
+        hwLeft=state['h_walls_x']
+        vwLeft=state['v_walls_x']
+    if player == 'O':
+        validMoves1.update(getValidMoves(state,state['position_o'][0]))
+        validMoves2.update(getValidMoves(state, state['position_o'][1]))
+        hwLeft=state['h_walls_o']
+        vwLeft=state['v_walls_o']
+
+    possibleStates = list()
+    for i in range(1,3):
+        if i==1: validMoves=validMoves1
+        if i==2: validMoves=validMoves2            
+        for validMove in validMoves:
+            if hwLeft>0:
+                for hpos in possibleHwall:
+                    possibleStates.append(newState(state,f"[{player} {i}] [{validMove.row} {validMove.col}] [H {hpos.row} {hpos.col}]"))
+            if vwLeft>0:
+                for vpos in possibleVwall:
+                    possibleStates.append(newState(state,f"[{player} {i}] [{validMove.row} {validMove.col}] [V {vpos.row} {vpos.col}]"))
+    
+    return possibleStates
+
+def getWallsTouching(state, position, touchingwall_kind):    # vraca set GridCoordinates
+    #moguce pozicije dodirnih zidova    
+    possibleTouchingWalls = set()
+    if position in state['v_walls']:
+        if touchingwall_kind == 'H':
+            possibleTouchingWalls.update( {
+                position.top().left(),
+                position.top(),
+                position.top().right(),
+                position.bottom(),
+                position.bottom().left(),
+                position.bottom().right(),
+                position.left(),
+                position.right()
+            } )
+        if touchingwall_kind == 'V':
+            possibleTouchingWalls.update({
+                position.top().top(),
+                position.bottom().bottom()
+            })
+    elif position in state['h_walls']:
+        if touchingwall_kind=='V':           
+            possibleTouchingWalls.update({
+                position.top().left(),
+                position.top(),
+                position.top().right(),
+                position.bottom(),
+                position.bottom().left(),
+                position.bottom().right(),
+                position.right(),
+                position.left()
+            })
+        if touchingwall_kind=='H':
+            possibleTouchingWalls.update({ 
+                position.left().left(),
+                position.right().right()
+            })
+
+    touchingWalls = set()
+
+    for pos in possibleTouchingWalls:
+        if touchingwall_kind=='V':
+            if pos in state['v_walls']:
+                touchingWalls.add(pos)        
+        if touchingwall_kind=='H':
+            if pos in state['h_walls']:
+                touchingWalls.add(pos)
+
+    return touchingWalls
+
+def wallSequence(state,wall_pos,seq):
+    hTouching = getWallsTouching(state,wall_pos,'H')
+    vTouching = getWallsTouching(state,wall_pos,'V')
+    if len(seq) != (seq.add(wall_pos) or len(seq)):    
+        for hw in hTouching:
+            wallSequence(state,hw,seq)
+        for vw in vTouching:
+            wallSequence(state,vw,seq)    
+
+def checkSeq(state,wall_pos):
+    seq=set()
+    wallSequence(state,wall_pos,seq)
+    homes=state['home_x']+state['home_o']
+
+    ivica=0    
+    for wall in seq:
+        if (wall in state['v_walls'] and wall.row==1)or(wall in state['v_walls'] and wall.row==state['table_length']):
+            ivica+=1 
+        if(wall in state['h_walls'] and wall.col==1)or(wall in state['h_walls'] and wall.col==state['table_width']):
+            ivica+=1
+
+    start=None
+    finish=None 
+    for wall in seq:            
+        for home in homes:
+            if start==None:
+                if wall.row==home.row or wall.col==home.col:
+                    start=wall
+                    break
+            elif finish==None:
+                if wall.row==home.row or wall.col==home.col:
+                    if start.col!=wall.col and start.row!=wall.row:
+                        finish = wall
+                        break  
+
+    if ivica>=2:
+        if isSeqWithinHomes(state, subSeq(seq,start,finish)):
+            return False
+    if isSeqClosed(seq):
+        return False
+    return True
+
+def isSeqWithinHomes(state,seq):    
+    for wall in seq:
+        if wall.row<state['home_x'][0].row or wall.row>state['home_x'][1].row or wall.col<state['home_x'[0]].col or wall.col>state['home_o'][0].col:
+            return False
+    return True
+
+def subSeq(seq,start,finish):
+    subSq=set()
+    if start in seq and finish in seq:
+        while start!=finish:
+            for wall in seq:            
+                if abs(wall.col - start.col)<=2 and abs(wall.row-start.row)<=2:
+                    subSeq.add(wall)
+                    start = wall
+                    break
+                if abs(wall.col - start.col)==2 and abs(wall.row-start.row)==2:
+                    if wall in state['h_walls'] and start in state['h_walls']:
+                        subSeq.add(wall)
+                        start=wall
+                        break
+                    if wall in state['v_walls'] and start in state['v_walls']:
+                        subSeq.add(wall)
+                        start=wall
+                        break
+    return subSq
+
+def isSeqClosed(seq):
+    seqL=list(seq)
+    for i in range(len(seqL)-1):
+        touch = getWallsTouching(state,seqL[i],'V')
+        touch.update(getWallsTouching(state,seqL[i],'H'))        
+        if seqL[i+1] in touch: continue        
+        for j in range(i,len(seqL)):
+            if seqL[j] in touch:
+                pom=seqL[i+1]
+                seqL[i+1]=seqL[j]
+                seqL[j]=pom
+                break
+
+    for i in range(len(seqL)-1):        
+        if abs(seqL[i].col - seqL[i+1].col)>2 or abs(seqL[i].row-seqL[i+1].row)>2:
+            return False
+        if abs(seqL[i].col - seqL[i+1].col)==2 or abs(seqL[i].row-seqL[i+1].row)==2:
+            if seqL[i] in state['h_walls'] and seqL[i+1] in state['v_walls']:
+                return False
+    return True
+
+
+state = initialState()
+#state['h_walls_x']=0
+#state['v_walls_x']
+state['h_walls']+=(GridCoordinates(7,9),GridCoordinates(3,6),GridCoordinates(2,4),GridCoordinates(4,4),GridCoordinates(4,2))
+state['v_walls']+=(GridCoordinates(1,5),GridCoordinates(1,8),GridCoordinates(3,5),GridCoordinates(3,1))
+#state['position_x']=(GridCoordinates(),GridCoordinates())
+print(tableString(state))
+checkSeq(state,GridCoordinates(1,5))
+
+    
+
+
+'''
 def game():
 
-    print('Ko je prvi na potezu?[covek,racunar](c\\r)?')
-    a=input()
-    print(a)
+    #print('Ko je prvi na potezu?[covek,racunar](c\\r)?')
+    #a=input()
+    #print(a)
 
     print('Da li zelite da igrate sa podrazumevanom tablom?(y\\n)?')
     a = input()
@@ -344,3 +548,4 @@ def game():
 
 
 game()
+'''
