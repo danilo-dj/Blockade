@@ -330,12 +330,13 @@ def removeWall(state,wall_coor,wall_kind,pawn):
 def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
 
     if  not re.match('\[[XO] [12]\] \[[0-9][0-9]* [0-9][0-9]*\] \[[VHX] [0-9][0-9]* [0-9][0-9]*\]',move):
-        return 'pogresan format poteza'     
+        print('pogresan format poteza')
+        return False     
 
-    steprow=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VH] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(1)
-    stepcol=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VH] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(2)
-    wallrow=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VH] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(3)
-    wallcol=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VH] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(4)
+    steprow=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VHX] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(1)
+    stepcol=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VHX] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(2)
+    wallrow=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VHX] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(3)
+    wallcol=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VHX] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(4)
     
     p=re.search('\[([XO]) ([0-9][0-9]*)\]', move).group(1)
     n=re.search('\[([XO]) ([0-9][0-9]*)\]', move).group(2)          
@@ -343,8 +344,7 @@ def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
     pawn=p+n
     step=GridCoordinates(int(steprow), int(stepcol))
     wall_kind=re.search('\[([VHX]) [0-9][0-9]* [0-9][0-9]*\]', move).group(1)
-    if int(wallcol)>0 and int(wallrow)>0:
-        wall_coor=GridCoordinates(int(wallrow),int(wallcol))       
+    wall_coor=GridCoordinates(int(wallrow),int(wallcol))       
 
     #postavljanje i provera zida
 
@@ -355,20 +355,21 @@ def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
                     if pathAstar(state,px,ho)==False:
                         removeWall(state,wall_coor,wall_kind,pawn)
                         print('Zid iskljucuje put do kuce')
-                        break
+                        return False                        
                 else:                    
                     continue
-                break
+                
             for po in state['position_o']:
                 for hx in state['home_x']:
                     if pathAstar(state,po,hx)==False:
                         removeWall(state,wall_coor,wall_kind,pawn)
                         print('Zid iskljucuje put do kuce')
-                        break
+                        return False
                 else:
                     continue
-                break
-            
+                
+    else:        
+        return False        
 
     #pomeranje pesaka
     switcher = {
@@ -386,15 +387,19 @@ def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
         switcher[pawn].set(step.row,step.col)
     else:
         print(f'Korak pesaka {pawn} nije validan')
-
+        removeWall(state, wall_coor, wall_kind, pawn)
+        return False
     print('Izvrsen je potez:'+move)
+    return True
 
 def makeAMoveInput(state,input):
     if  re.match('\[[XO] [12]\] \[[0-9][0-9]* [0-9][0-9]*\] \[[VH] [0-9][0-9]* [0-9][0-9]*\]',input):
-        makeAMove(state, input)
+        return makeAMove(state, input)
     elif  re.match('\[[XO] [12]\] \[[0-9][0-9]* [0-9][0-9]*\]' ,input): 
-        makeAMove(state, input + '[X 0 0]')
-    else: print('nevalidan format poteza')  
+        return makeAMove(state, input + ' [X 0 0]')
+    else: 
+        print('nevalidan format poteza') 
+        return False 
 
 def is_end(state):
     if (state['position_x'][0]==state['home_o'][0] or 
@@ -637,20 +642,18 @@ def game():
             print('Igrac O je na potezu!')
         print('Unesi potez u formatu \n [igrac brpesaka] [korak] [vrstazid poszida] \n')        
         move=input()
-        if re.match('\[X [12]\]',move) and i%2==0:
-            makeAMoveInput(state, move)
+        if re.match('\[[X] [12]\] \[[0-9][0-9]* [0-9][0-9]*\]',move) and i%2==0:
+            if makeAMoveInput(state, move):
+                i+=1
             print(tableString(state))
-            i+=1
-        elif re.match('\[O [12]\]',move) and i%2!=0:
-            makeAMoveInput(state, move)
+        elif re.match('\[[O] [12]\] \[[0-9][0-9]* [0-9][0-9]*\]',move) and i%2!=0:
+            if makeAMoveInput(state, move):
+                i+=1
             print(tableString(state))
-            i+=1
         elif re.match('quit',move):
             break
         else:
             print(tableString(state))
-            continue      
-                
-
-
+            continue     
+              
 game()
