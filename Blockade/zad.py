@@ -115,65 +115,8 @@ def getValidMoves(state,pawn): #[X 1] [6 3] [V 4 9] stanje i poziciju pesaka
 
     for pos in one_step:
         if pos in state['home_x'] or pos in state['home_o']:
-            possible_moves.add(pos)   
+            possible_moves.add(pos)
 
-    #za horizontanlne zidove
-
-    if pawn.top().top() in state['h_walls']: 
-        possible_moves-={pawn.top().top()}
-        possible_moves.add(pawn.top())  
-    if pawn.bottom() in state['h_walls']:
-        possible_moves-={pawn.bottom().bottom()}
-        possible_moves.add(pawn.bottom())
-    if pawn.bottom().left() in state['h_walls']:
-        possible_moves-={pawn.bottom().bottom()}
-        possible_moves.add(pawn.bottom())
-    if pawn.top().top().left()in state['h_walls']:
-        possible_moves-={pawn.top().top()}
-        possible_moves.add(pawn.top())
-
-    if pawn.top().left() in state['h_walls']:
-        possible_moves-={pawn.top().top(), pawn.top(), pawn.top().left()}
-    if pawn.top() in state['h_walls']: 
-        possible_moves-={ pawn.top(), pawn.top().right(), pawn.top().top()}        
-    if pawn in state['h_walls']:
-        possible_moves-={pawn.bottom(),pawn.bottom().right(),pawn.bottom().bottom()}   
-    if pawn.left() in state['h_walls']:
-        possible_moves-={pawn.bottom().bottom(), pawn.bottom().left(), pawn.bottom()}
-
-    #za vertikalne zidove
-
-    if pawn.left().left() in state['v_walls']:
-        possible_moves-={pawn.left().left()}
-        possible_moves.add(pawn.left())
-    if pawn.right() in state['v_walls']:
-        possible_moves-={pawn.right().right()}
-        possible_moves.add(pawn.right())
-    if pawn.top().left().left() in state['v_walls']:
-        possible_moves-={pawn.left().left()}
-        possible_moves.add(pawn.left())
-    if pawn.top().right() in state['v_walls']:
-        possible_moves-={pawn.right().right()}
-        possible_moves.add(pawn.right())
-    
-    if pawn.left() in state['v_walls']:
-        possible_moves-={pawn.left().left(), pawn.left(), pawn.bottom().left()}
-    if pawn in state['v_walls']:
-        possible_moves-={pawn.right().right(), pawn.right(), pawn.bottom().right()}    
-    if pawn.top().left() in state['v_walls']:
-        possible_moves-={pawn.left().left(), pawn.left(), pawn.top().left}
-    if pawn.top() in state['v_walls']:
-        possible_moves-={pawn.right().right(), pawn.right(), pawn.top().right()}
-
-    #ako postoji pesak na possible_moves    
-    
-    for pm in possible_moves.copy():
-        if pm in state['position_o'] or pm in state['position_x']:
-            p=pm in state['position_o'] or pm in state['position_x']
-            if pm not in state['home_x'] and pm not in state['home_o']:
-                c=pm not in state['home_x'] and pm not in state['home_o']
-                possible_moves.remove(pm)
-        
     #u slucaju da su drugi pesaci na krajnjim pozicijama moze da se pomeri za jedan korak   
 
     if pawn.top().top() in state['position_x'] or pawn.top().top() in state['position_o']:
@@ -184,7 +127,95 @@ def getValidMoves(state,pawn): #[X 1] [6 3] [V 4 9] stanje i poziciju pesaka
         possible_moves.add(pawn.bottom())
     if pawn.right().right() in state['position_x'] or pawn.right().right() in state['position_o']:
         possible_moves.add(pawn.right())
-                                                           
+
+    #za horizontanlne zidove add
+
+    if pawn.top().top() in state['h_walls']: 
+        possible_moves.add(pawn.top())  
+    if pawn.bottom() in state['h_walls']:
+        possible_moves.add(pawn.bottom())
+    if pawn.bottom().left() in state['h_walls']:
+        possible_moves.add(pawn.bottom())
+    if pawn.top().top().left()in state['h_walls']:
+        possible_moves.add(pawn.top())
+    
+    #za vertikalne zidove add
+
+    if pawn.left().left() in state['v_walls']:
+        possible_moves.add(pawn.left())
+    if pawn.right() in state['v_walls']:
+        possible_moves.add(pawn.right())
+    if pawn.top().left().left() in state['v_walls']:
+        possible_moves.add(pawn.left())
+    if pawn.top().right() in state['v_walls']:
+        possible_moves.add(pawn.right())
+
+    #ako postoji pesak na possible_moves    
+    for pm in possible_moves.copy():
+        if pm in state['position_o'] or pm in state['position_x']:
+            p=pm in state['position_o'] or pm in state['position_x']
+            if pm not in state['home_x'] and pm not in state['home_o']:
+                c=pm not in state['home_x'] and pm not in state['home_o']
+                possible_moves.remove(pm)
+
+    #za horizontanlne zidove remove
+
+    if pawn.top().top() in state['h_walls']: 
+        possible_moves-={pawn.top().top()}  
+    if pawn.bottom() in state['h_walls']:
+        possible_moves-={pawn.bottom().bottom()}
+    if pawn.bottom().left() in state['h_walls']:
+        possible_moves-={pawn.bottom().bottom()}
+    if pawn.top().top().left()in state['h_walls']:
+        possible_moves-={pawn.top().top()}
+
+    if pawn.top().left() in state['h_walls']:
+        possible_moves-={pawn.top().top(), pawn.top(), pawn.top().left()}
+    if pawn.top() in state['h_walls']: 
+        possible_moves-={ pawn.top(), pawn.top().right(), pawn.top().top()}        
+    if pawn in state['h_walls']:
+        possible_moves-={pawn.bottom(),pawn.bottom().right(),pawn.bottom().bottom()}   
+    if pawn.left() in state['h_walls']:
+        possible_moves-={pawn.bottom().bottom(), pawn.bottom().left(), pawn.bottom()}
+
+    #za vertikalne zidove remove
+
+    if pawn.left().left() in state['v_walls']:
+        possible_moves-={pawn.left().left()}
+    if pawn.right() in state['v_walls']:
+        possible_moves-={pawn.right().right()}
+    if pawn.top().left().left() in state['v_walls']:
+        possible_moves-={pawn.left().left()}
+    if pawn.top().right() in state['v_walls']:
+        possible_moves-={pawn.right().right()}
+    
+    if pawn.left() in state['v_walls']:
+        possible_moves-={pawn.left().left(), pawn.left(), pawn.bottom().left()}
+    if pawn in state['v_walls']:
+        possible_moves-={pawn.right().right(), pawn.right(), pawn.bottom().right()}    
+    if pawn.top().left() in state['v_walls']:
+        possible_moves-={pawn.left().left(), pawn.left(), pawn.top().left()}
+    if pawn.top() in state['v_walls']:
+        possible_moves-={pawn.right().right(), pawn.right(), pawn.top().right()}    
+
+    #za kombinaciju zidova
+    if pawn.left().left() in state['h_walls'] and pawn.bottom().left() in state['v_walls']:
+        possible_moves-={pawn.bottom().left()}
+    if pawn.top().top().left() in state['v_walls'] and pawn.top().left().left() in state['h_walls']:
+        possible_moves-={pawn.top().left()}
+    if pawn.top().top() in state['v_walls'] and pawn.top().right() in state['h_walls']:
+        possible_moves-={pawn.top().right()}
+    if pawn.right() in state['h_walls'] and pawn.bottom() in state['v_walls']:
+        possible_moves-={pawn.right().bottom()}
+    if pawn.left() in state['h_walls'] and pawn.top() in state['v_walls']:
+        possible_moves-={pawn.bottom().right()}
+    if pawn.top().left() in state['h_walls'] and pawn in state['v_walls']:
+        possible_moves-={pawn.top().right()}
+    if pawn in state['h_walls'] and pawn.top().left() in state['v_walls']:
+        possible_moves-={pawn.bottom().left()}
+    if pawn.top() in state['h_walls'] and pawn.left() in state['v_walls']:
+        possible_moves-={pawn.top().left()}    
+
     return possible_moves
 
 def checkPositionForWall (state, position, wall): # 'V' 'H'
@@ -210,9 +241,95 @@ def checkPositionForWall (state, position, wall): # 'V' 'H'
 
     return True
 
+def addWall(state,wall_coor,wall_kind,pawn):
+    if checkPositionForWall(state,wall_coor,wall_kind):
+        if wall_kind=='H':
+            if re.match('X[12]',pawn):
+                if state['h_walls_x']>0:
+                    state['h_walls']+=(wall_coor,)
+                    state['h_walls_x']-=1
+                    return True
+                else:
+                    print('Igrac X nema vise H zidova')
+                    return False    
+            if re.match('O[12]',pawn):
+                if state['h_walls_o']>0:
+                    state['h_walls']+=(wall_coor,)
+                    state['h_walls_o']-=1
+                    return True
+                else:
+                    print('Igrac O nema vise H zidova')
+                    return False
+            
+        if wall_kind=='V':
+            if re.match('X[12]',pawn):
+                if state['v_walls_x']>0:
+                    state['v_walls']+=(wall_coor,)
+                    state['v_walls_x']-=1
+                    return True
+                else:
+                    print('Igrac X nema vise V zidova')
+                    return False   
+            if re.match('O[12]',pawn):
+                if state['v_walls_o']>0:
+                    state['v_walls']+=(wall_coor,)
+                    state['v_walls_o']-=1
+                    return True
+                else:
+                    print('Igrac O nema vise V zidova')
+                    return False
+        
+        if wall_kind=='X':
+            if re.match('X[12]',pawn):
+                if state['v_walls_x']>0:                
+                    print('Igrac X ima jos V zidova')
+                if state['h_walls_x']>0:
+                    print('Igrac X ima jos H zidova')   
+            if re.match('O[12]',pawn):
+                if state['v_walls_o']>0:                    
+                    print('Igrac O ima jos V zidova')
+                if state['h_walls_o']:
+                    print('Igrac O ime jos H zidova')
+            return False
+    else:
+        print(f'Izabrano polje {wall_coor} za zid je zauzeto')
+        return False
+
+def removeWall(state,wall_coor,wall_kind,pawn):
+    if wall_kind=='H':
+        if wall_coor in state['h_walls']:
+                li=list(state['h_walls'])
+                li.remove(wall_coor)
+                state['h_walls']=tuple(li)
+                if re.match('X[12]',pawn):            
+                    state['h_walls_x']+=1                    
+                if re.match('O[12]',pawn):
+                    state['h_walls_o']+=1
+                return True
+        else:
+            print('Uneti zid za brisanje nije na tabli')
+            return False   
+            
+    if wall_kind=='V':
+        if wall_coor in state['v_walls']:
+                li = list(state['v_walls'])
+                li.remove(wall_coor)
+                state['v_walls']=tuple(li)
+                if re.match('X[12]',pawn):            
+                    state['v_walls_x']+=1                    
+                if re.match('O[12]',pawn):
+                    state['v_walls_o']+=1
+                return True
+        else:
+            print('Uneti zid za brisanje nije na tabli')
+            return False
+        
+           
+
+
 def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
 
-    if  not re.match('\[[XO] [12]\] \[[0-9][0-9]* [0-9][0-9]*\] \[[VH] [0-9][0-9]* [0-9][0-9]*\]',move):
+    if  not re.match('\[[XO] [12]\] \[[0-9][0-9]* [0-9][0-9]*\] \[[VHX] [0-9][0-9]* [0-9][0-9]*\]',move):
         return 'pogresan format poteza'     
 
     steprow=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VH] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(1)
@@ -225,45 +342,35 @@ def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
 
     pawn=p+n
     step=GridCoordinates(int(steprow), int(stepcol))
-    wall_kind=re.search('\[([VH]) [0-9][0-9]* [0-9][0-9]*\]', move).group(1)
-    wall_coor=GridCoordinates(int(wallrow),int(wallcol))       
+    wall_kind=re.search('\[([VHX]) [0-9][0-9]* [0-9][0-9]*\]', move).group(1)
+    if int(wallcol)>0 and int(wallrow)>0:
+        wall_coor=GridCoordinates(int(wallrow),int(wallcol))       
 
     #postavljanje i provera zida
 
-    if checkPositionForWall(state,wall_coor,wall_kind):
-        if wall_kind=='H':
-            if re.match('X[12]',pawn):
-                if state['h_walls_x']>0:
-                    state['h_walls']+=(wall_coor,)
-                    state['h_walls_x']-=1
+    if addWall(state,wall_coor,wall_kind,pawn):
+        if isTouchingTwoWalls(state,wall_coor):
+            for px in state['position_x']:
+                for ho in state['home_o']:
+                    if pathAstar(state,px,ho)==False:
+                        removeWall(state,wall_coor,wall_kind,pawn)
+                        print('Zid iskljucuje put do kuce')
+                        break
+                else:                    
+                    continue
+                break
+            for po in state['position_o']:
+                for hx in state['home_x']:
+                    if pathAstar(state,po,hx)==False:
+                        removeWall(state,wall_coor,wall_kind,pawn)
+                        print('Zid iskljucuje put do kuce')
+                        break
                 else:
-                    return 'Igrac X nema vise H zidova'    
-            if re.match('O[12]',pawn):
-                if state['h_walls_o']>0:
-                    state['h_walls']+=(wall_coor,)
-                    state['h_walls_o']-=1
-                else:
-                    return 'Igrac O nema vise H zidova'
+                    continue
+                break
             
-        if wall_kind=='V':
-            if re.match('X[12]',pawn):
-                if state['v_walls_x']>0:
-                    state['v_walls']+=(wall_coor,)
-                    state['v_walls_x']-=1
-                else:
-                    return 'Igrac X nema vise V zidova'    
-            if re.match('O[12]',pawn):
-                if state['v_walls_o']>0:
-                    state['v_walls']+=(wall_coor,)
-                    state['v_walls_o']-=1
-                else:
-                    return 'Igrac O nema vise V zidova'
-    else:
-        return f'Izabrano polje {wall_coor} za zid je zauzeto'
-
 
     #pomeranje pesaka
-
     switcher = {
         'X1': state['position_x'][0],
         'X2': state['position_x'][1],
@@ -278,9 +385,16 @@ def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
     if step in validMoves:
         switcher[pawn].set(step.row,step.col)
     else:
-        return f'Korak pesaka {pawn} nije validan'
+        print(f'Korak pesaka {pawn} nije validan')
 
-    return 'Izvrsen je potez:'+move
+    print('Izvrsen je potez:'+move)
+
+def makeAMoveInput(state,input):
+    if  re.match('\[[XO] [12]\] \[[0-9][0-9]* [0-9][0-9]*\] \[[VH] [0-9][0-9]* [0-9][0-9]*\]',input):
+        makeAMove(state, input)
+    elif  re.match('\[[XO] [12]\] \[[0-9][0-9]* [0-9][0-9]*\]' ,input): 
+        makeAMove(state, input + '[X 0 0]')
+    else: print('nevalidan format poteza')  
 
 def is_end(state):
     if (state['position_x'][0]==state['home_o'][0] or 
@@ -344,154 +458,139 @@ def possibleStatesOneMove(state, player): # 'X' ili 'O'
     
     return possibleStates
 
-def getWallsTouching(state, position, touchingwall_kind):    # vraca set GridCoordinates
+def isTouchingTwoWalls(state, position):    # da li wall na pos dodiruje dva zida
     #moguce pozicije dodirnih zidova    
-    possibleTouchingWalls = set()
-    if position in state['v_walls']:
-        if touchingwall_kind == 'H':
-            possibleTouchingWalls.update( {
-                position.top().left(),
-                position.top(),
-                position.top().right(),
-                position.bottom(),
-                position.bottom().left(),
-                position.bottom().right(),
-                position.left(),
-                position.right()
-            } )
-        if touchingwall_kind == 'V':
-            possibleTouchingWalls.update({
-                position.top().top(),
-                position.bottom().bottom()
-            })
-    elif position in state['h_walls']:
-        if touchingwall_kind=='V':           
-            possibleTouchingWalls.update({
-                position.top().left(),
-                position.top(),
-                position.top().right(),
-                position.bottom(),
-                position.bottom().left(),
-                position.bottom().right(),
-                position.right(),
-                position.left()
-            })
-        if touchingwall_kind=='H':
-            possibleTouchingWalls.update({ 
-                position.left().left(),
-                position.right().right()
-            })
+    possibleTouchingWallsH = set()
+    possibleTouchingWallsV = set()
+    if position in state['v_walls']:        
+        possibleTouchingWallsH.update( {
+            position.top().left(),
+            position.top(),
+            position.top().right(),
+            position.bottom(),
+            position.bottom().left(),
+            position.bottom().right(),
+            position.left(),
+            position.right()
+        } )        
+        possibleTouchingWallsV.update({
+            position.top().top(),
+            position.bottom().bottom()
+        })
+    elif position in state['h_walls']:                  
+        possibleTouchingWallsV.update({
+            position.top().left(),
+            position.top(),
+            position.top().right(),
+            position.bottom(),
+            position.bottom().left(),
+            position.bottom().right(),
+            position.right(),
+            position.left()
+        })    
+        possibleTouchingWallsH.update({ 
+            position.left().left(),
+            position.right().right()
+        })
+    touchingWalls = 0 
 
-    touchingWalls = set()
+    for pos in possibleTouchingWallsV:
+        if pos in state['v_walls']:
+            touchingWalls+=1
+    for pos in possibleTouchingWallsH:
+        if pos in state['h_walls']:
+            touchingWalls+=1        
 
-    for pos in possibleTouchingWalls:
-        if touchingwall_kind=='V':
-            if pos in state['v_walls']:
-                touchingWalls.add(pos)        
-        if touchingwall_kind=='H':
-            if pos in state['h_walls']:
-                touchingWalls.add(pos)
+    if touchingWalls >= 2:
+        return True
+    else:
+        return False    
 
-    return touchingWalls
+def heuristic(path_state, possibleMoves, home):
+               
+    if path_state[-1] == home:
+        return 0    
+    
+    heu=12-len(possibleMoves)
+    for elem in possibleMoves:
+        if elem == home:           
+            heu -= 2 
+    return heu   
 
-def wallSequence(state,wall_pos,seq):
-    hTouching = getWallsTouching(state,wall_pos,'H')
-    vTouching = getWallsTouching(state,wall_pos,'V')
-    if len(seq) != (seq.add(wall_pos) or len(seq)):    
-        for hw in hTouching:
-            wallSequence(state,hw,seq)
-        for vw in vTouching:
-            wallSequence(state,vw,seq)    
+def generateGraphElement(path_state,state, home):
+    possibleMoves = list()
+    validMoves = list(getValidMoves(state, path_state[-1]))
+      
+    for vM in validMoves:
+        if vM in path_state:
+            validMoves.remove(vM)
+            continue
+        cost = 0        
+        cost+= abs(home.col-vM.col)+abs(home.row - vM.row)
+        possibleMoves.append(((vM,),cost))        
 
-def checkSeq(state,wall_pos):
-    seq=set()
-    wallSequence(state,wall_pos,seq)
-    homes=state['home_x']+state['home_o']
+    return (heuristic(path_state,possibleMoves,home), possibleMoves)
 
-    ivica=0    
-    for wall in seq:
-        if (wall in state['v_walls'] and wall.row==1)or(wall in state['v_walls'] and wall.row==state['table_length']):
-            ivica+=1 
-        if(wall in state['h_walls'] and wall.col==1)or(wall in state['h_walls'] and wall.col==state['table_width']):
-            ivica+=1
+def pathAstar(state, pawn_pos, home):
+    found_end = False
+    open_set = set()
+    closed_set = set()
+    g = {}
+    prev_nodes = {}    
+    g[(pawn_pos,)] = 0
+    prev_nodes[(pawn_pos,)] = None
+    open_set.add((pawn_pos,))
+    while len(open_set) > 0 and len(closed_set) < 140 and (not found_end): 
+        node = None
+        for next_node in open_set:
+            if node is None or g[next_node] + generateGraphElement(next_node,state,home)[0] < g[node] + generateGraphElement(node,state,home)[0]:
+                node = next_node
+        endHeuristic=generateGraphElement(node,state,home)[0]
+        if endHeuristic==0:
+            found_end = True
+            end=node
+            break
+        for (m, cost) in generateGraphElement(node,state,home)[1]:
+            if m not in open_set and m not in closed_set:
+                open_set.add(m)
+                prev_nodes[m] = node
+                g[m] = g[node] + cost
+            else:
+                if g[m] > g[node] + cost:
+                    g[m] = g[node] + cost
+                    prev_nodes[m] = node
+                    if m in closed_set:
+                        closed_set.remove(m)
+                        open_set.add(m)
+        open_set.remove(node)
+        closed_set.add(node)        
+    path = []
+    if found_end:
+        prev = end
+        while prev_nodes[prev] is not None:
+            path.append(prev)
+            prev = prev_nodes[prev]
+        path.append(prev)
+        path.reverse()
+        return path
+    else:
+        return False 
 
-    start=None
-    finish=None 
-    for wall in seq:            
-        for home in homes:
-            if start==None:
-                if wall.row==home.row or wall.col==home.col:
-                    start=wall
-                    break
-            elif finish==None:
-                if wall.row==home.row or wall.col==home.col:
-                    if start.col!=wall.col and start.row!=wall.row:
-                        finish = wall
-                        break  
-
-    if ivica>=2:
-        if isSeqWithinHomes(state, subSeq(seq,start,finish)):
-            return False
-    if isSeqClosed(seq):
-        return False
-    return True
-
-def isSeqWithinHomes(state,seq):    
-    for wall in seq:
-        if wall.row<state['home_x'][0].row or wall.row>state['home_x'][1].row or wall.col<state['home_x'[0]].col or wall.col>state['home_o'][0].col:
-            return False
-    return True
-
-def subSeq(seq,start,finish):
-    subSq=set()
-    if start in seq and finish in seq:
-        while start!=finish:
-            for wall in seq:            
-                if abs(wall.col - start.col)<=2 and abs(wall.row-start.row)<=2:
-                    subSeq.add(wall)
-                    start = wall
-                    break
-                if abs(wall.col - start.col)==2 and abs(wall.row-start.row)==2:
-                    if wall in state['h_walls'] and start in state['h_walls']:
-                        subSeq.add(wall)
-                        start=wall
-                        break
-                    if wall in state['v_walls'] and start in state['v_walls']:
-                        subSeq.add(wall)
-                        start=wall
-                        break
-    return subSq
-
-def isSeqClosed(seq):
-    seqL=list(seq)
-    for i in range(len(seqL)-1):
-        touch = getWallsTouching(state,seqL[i],'V')
-        touch.update(getWallsTouching(state,seqL[i],'H'))        
-        if seqL[i+1] in touch: continue        
-        for j in range(i,len(seqL)):
-            if seqL[j] in touch:
-                pom=seqL[i+1]
-                seqL[i+1]=seqL[j]
-                seqL[j]=pom
-                break
-
-    for i in range(len(seqL)-1):        
-        if abs(seqL[i].col - seqL[i+1].col)>2 or abs(seqL[i].row-seqL[i+1].row)>2:
-            return False
-        if abs(seqL[i].col - seqL[i+1].col)==2 or abs(seqL[i].row-seqL[i+1].row)==2:
-            if seqL[i] in state['h_walls'] and seqL[i+1] in state['v_walls']:
-                return False
-    return True
-
-
+'''
 state = initialState()
 #state['h_walls_x']=0
 #state['v_walls_x']
-state['h_walls']+=(GridCoordinates(7,9),GridCoordinates(3,6),GridCoordinates(2,4),GridCoordinates(4,4),GridCoordinates(4,2))
-state['v_walls']+=(GridCoordinates(1,5),GridCoordinates(1,8),GridCoordinates(3,5),GridCoordinates(3,1))
+state['h_walls']+=(GridCoordinates(7,9),GridCoordinates(3,6),GridCoordinates(2,4),GridCoordinates(3,10),GridCoordinates(5,10),GridCoordinates(7,11),
+                    GridCoordinates(7,13),GridCoordinates(4,5),GridCoordinates(6,7))
+state['v_walls']+=(GridCoordinates(1,5),GridCoordinates(1,8),GridCoordinates(4,9),GridCoordinates(4,11),GridCoordinates(8,10),GridCoordinates(6,4),
+                    GridCoordinates(8,4),GridCoordinates(9,8),GridCoordinates(7,6))
 #state['position_x']=(GridCoordinates(),GridCoordinates())
 print(tableString(state))
-checkSeq(state,GridCoordinates(1,5))
+for coor in pathAstar(state,GridCoordinates(2,5),state['home_o'][0]):
+    print(coor[0])
+print('===')
+for c in getValidMoves(state,GridCoordinates(5,12)):
+    print(c)
 
     
 
@@ -529,23 +628,29 @@ def game():
         state = initialState(table_width,table_length,home_x,home_o,walls)
     
     print(tableString(state))
-
-    a=3
-    while a>0:
-        print('Igrac X je na potezu!')
-        print('Unesi potez u formatu \n [igrac brpesaka] [korak] [vrstazid pozyida] \n')
+    
+    i=0
+    while is_end(state)==False:
+        if i%2==0:
+            print('Igrac X je na potezu!')
+        else:
+            print('Igrac O je na potezu!')
+        print('Unesi potez u formatu \n [igrac brpesaka] [korak] [vrstazid poszida] \n')        
         move=input()
-        print(makeAMove(state, move))
-        print(is_end(state))
-        print(tableString(state))
-        print('Igrac O je na potezu!')
-        print('Unesi potez u formatu \n [igrac brpesaka] [korak] [vrstazid pozyida] \n')
-        move=input()
-        print(makeAMove(state, move))
-        print(is_end(state))
-        print(tableString(state))
-        a-=1
+        if re.match('\[X [12]\]',move) and i%2==0:
+            makeAMoveInput(state, move)
+            print(tableString(state))
+            i+=1
+        elif re.match('\[O [12]\]',move) and i%2!=0:
+            makeAMoveInput(state, move)
+            print(tableString(state))
+            i+=1
+        elif re.match('quit',move):
+            break
+        else:
+            print(tableString(state))
+            continue      
+                
 
 
 game()
-'''
