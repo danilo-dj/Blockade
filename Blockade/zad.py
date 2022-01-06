@@ -216,6 +216,22 @@ def getValidMoves(state,pawn): #[X 1] [6 3] [V 4 9] stanje i poziciju pesaka
         possible_moves-={pawn.bottom().left()}
     if pawn.top() in state['h_walls'] and pawn.left() in state['v_walls']:
         possible_moves-={pawn.top().left()}    
+    if pawn.left() in state['v_walls'] and pawn.top().top().left() in state['v_walls']:
+        possible_moves-={pawn.top().left()}
+    if pawn.top().left() in state['v_walls'] and pawn.bottom().left() in state['v_walls']:
+        possible_moves-={pawn.bottom().left()}
+    if pawn.top().top() in state['v_walls'] and pawn in state['v_walls']:
+        possible_moves-={pawn.top().right()}
+    if pawn.top() in state['v_walls'] and pawn.bottom() in state['v_walls']:
+        possible_moves-={pawn.bottom().right()}
+    if pawn.top() in state['h_walls'] and pawn.top().left().left() in state['h_walls']:
+        possible_moves-={pawn.top().left()}
+    if pawn.top().left() in state['h_walls'] and pawn.top().right() in state['h_walls']:
+        possible_moves-={pawn.top().right()}
+    if pawn.left().left() in state['h_walls'] and pawn in state['h_walls']:
+        possible_moves-={pawn.bottom().left()}
+    if pawn.left() in state['h_walls'] and pawn.right() in state['h_walls']:
+        possible_moves-={pawn.bottom().right()}
 
     return possible_moves
 
@@ -232,12 +248,16 @@ def checkPositionForWall (state, position, wall): # 'V' 'H'
     for hw in state['h_walls']:
         if position == hw.right() and wall =='H':
             return False
+        if position == hw.left() and wall == 'H':
+            return False
 
     for vw in state['v_walls']:
         if position == vw.bottom()  and wall =='V':
+            return False
+        if position == vw.top() and wall == 'V':
             return False 
 
-    if position.col == state['table_width'] or position.row== state['table_length']:
+    if position.col == state['table_width'] or position.row == state['table_length']:
         return False 
 
     return True
@@ -582,14 +602,14 @@ def pathAstar(state, pawn_pos, home):
     else:
         return False 
 
-def eval_state(state,player):
+def eval_state(state,player):        
     return randint(0,100)
 
 
 def max_value(states, depth, alpha, beta, maxplayer):
     minplayer = 'X' if maxplayer=='O' else 'O'
-    if depth == 0 or is_end(states[-1], maxplayer):
-        return (states, eval_state(states[-1]))
+    if depth == 0:
+        return (states, eval_state(states[-1], maxplayer))
     else:
         for s in possibleStatesOneMove(states[-1],maxplayer):                        
             alpha = max(alpha,
