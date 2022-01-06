@@ -1,5 +1,6 @@
 from coordinates import GridCoordinates
 from copy import *
+from random import randint
 import re 
 
 def initialState(
@@ -406,62 +407,62 @@ def is_end(state):
         state['position_x'][1]==state['home_o'][0] or
         state['position_x'][0]==state['home_o'][1] or
         state['position_x'][1]==state['home_o'][1]):
-            print('Pobedio je igrac X')
+            print('Pobedio je igrac X')            
             return True
     if (state['position_o'][0]==state['home_x'][0] or 
         state['position_o'][1]==state['home_x'][0] or
         state['position_o'][0]==state['home_x'][1] or
         state['position_o'][1]==state['home_x'][1]):
-            print('Pobedio je igrac O')
+            print('Pobedio je igrac O')            
             return True
     print('Sledeci potez') 
     return False 
 
 def newState(state, move):
     pom = deepcopy(state)
-    makeAMove(pom, move)
-    return pom
+    if(makeAMoveInput(pom, move)):
+        return pom
+    else:
+        return None
 
 def possibleStatesOneMove(state, player): # 'X' ili 'O'    
-    #moguce pozicije horizontalnih i vertikalnih zidova na osnovu trenutnog stanja    
-    allCoor = list()
-    for i in range(1,state['table_length']+1):
-            for j in range(1,state['table_width']+1):
-                allCoor.append(GridCoordinates(i,j))
-    possibleHwall = list()
-    possibleVwall = list()
-    for pos in allCoor:
-        if checkPositionForWall(state,pos,'H'):
-            possibleHwall.append(pos)
-        if checkPositionForWall(state,pos,'V'):
-            possibleVwall.append(pos)            
-    #moguce pozicije pojedinacnog piona i broj ostalih zidova
-    validMoves1 = set()
-    validMoves2 = set()
-    if player == 'X':        
-        validMoves1.update(getValidMoves(state,state['position_x'][0]))
-        validMoves2.update(getValidMoves(state, state['position_x'][1]))
+              
+    #najkraci putevi
+    
+    lpX=list()
+    lpO=list()
+    for ho in state['home_o']:
+        for i in range(2):            
+            path=pathAstar(state,state['position_x'][i],ho)
+            if path!=False:
+                lpX.append((path, i+1, len(path)))                            
+    
+    for hx in state['home_x']:
+        for i in range(2):
+            path=pathAstar(state,state['position_o'][i],hx)
+            if path!=False:                
+                lpO.append((path, i+1, len(path)))
+    if player == 'X':
+        minpath = min(lpX, key=lambda x: x[2])
+        minenemy= min(lpO, key=lambda x: x[2])       
         hwLeft=state['h_walls_x']
         vwLeft=state['v_walls_x']
     if player == 'O':
-        validMoves1.update(getValidMoves(state,state['position_o'][0]))
-        validMoves2.update(getValidMoves(state, state['position_o'][1]))
+        minpath = min(lpO, key=lambda x: x[2])
+        minenemy = min(lpX, key=lambda x: x[2])
         hwLeft=state['h_walls_o']
         vwLeft=state['v_walls_o']
 
     possibleStates = list()
-    for i in range(1,3):
-        if i==1: validMoves=validMoves1
-        if i==2: validMoves=validMoves2            
-        for validMove in validMoves:
-            if hwLeft>0:
-                for hpos in possibleHwall:
-                    possibleStates.append(newState(state,f"[{player} {i}] [{validMove.row} {validMove.col}] [H {hpos.row} {hpos.col}]"))
-            if vwLeft>0:
-                for vpos in possibleVwall:
-                    possibleStates.append(newState(state,f"[{player} {i}] [{validMove.row} {validMove.col}] [V {vpos.row} {vpos.col}]"))
-    
-    return possibleStates
+    for pos in minenemy[0]:
+        if hwLeft>0:                        
+            possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {pos[0].row} {pos[0].col}]"))
+        if vwLeft>0:
+            possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {pos[0].row} {pos[0].col}]"))
+        if hwLeft==0 and vwLeft==0:
+            possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}]"))
+   
+    return list(filter(lambda x: x != None,possibleStates))
 
 def isTouchingTwoWalls(state, position):    # da li wall na pos dodiruje dva zida
     #moguce pozicije dodirnih zidova    
@@ -581,21 +582,55 @@ def pathAstar(state, pawn_pos, home):
     else:
         return False 
 
-'''
+def eval_state(state):
+    return randint(0,100)
+
+
+def max_value(state, depth, alpha, beta, maxplayer):
+    minplayer = 'X' if maxplayer=='O' else 'O'
+    if depth == 0 or is_end(state):
+        return (state, eval_state(state))
+    else:
+        for s in possibleStatesOneMove(state,maxplayer):
+            alpha = max(alpha,
+                        min_value(s,depth-1, alpha,beta, minplayer),
+                        key=lambda x: x[1])
+            if alpha[1] >= beta[1]:
+                return beta
+    return alpha
+
+def min_value(state,depth,alpha, beta, minplayer):
+    maxplayer = 'X' if minplayer=='O' else 'O'
+    if depth == 0 or is_end(state):
+        return (state, eval_state(state))
+    else:
+        for s in possibleStatesOneMove(state,minplayer):
+            beta = min(beta,
+                        max_value(s, depth-1, alpha, beta, maxplayer),
+                        key=lambda x: x[1])
+            if beta[1] <= alpha[1]:
+                return alpha
+    return beta
+
+def minmax(state, depth, mymove, maxplayer, alpha=(initialState(),-1000000), beta=(initialState(),+1000000)):  #alpha beta su tuplovi (stanje, eval)
+    minplayer = 'X' if maxplayer=='O' else 'O'
+    if mymove:
+        return max_value(state, depth, alpha, beta, maxplayer)
+    else:
+        return min_value(state, depth, alpha, beta, minplayer) 
+
+
 state = initialState()
 #state['h_walls_x']=0
 #state['v_walls_x']
 state['h_walls']+=(GridCoordinates(7,9),GridCoordinates(3,6),GridCoordinates(2,4),GridCoordinates(3,10),GridCoordinates(5,10),GridCoordinates(7,11),
                     GridCoordinates(7,13),GridCoordinates(4,5),GridCoordinates(6,7))
-state['v_walls']+=(GridCoordinates(1,5),GridCoordinates(1,8),GridCoordinates(4,9),GridCoordinates(4,11),GridCoordinates(8,10),GridCoordinates(6,4),
+state['v_walls']+=(GridCoordinates(1,5),GridCoordinates(1,8),GridCoordinates(4,8),GridCoordinates(4,11),GridCoordinates(8,10),GridCoordinates(6,4),
                     GridCoordinates(8,4),GridCoordinates(9,8),GridCoordinates(7,6))
 #state['position_x']=(GridCoordinates(),GridCoordinates())
 print(tableString(state))
-for coor in pathAstar(state,GridCoordinates(2,5),state['home_o'][0]):
-    print(coor[0])
-print('===')
-for c in getValidMoves(state,GridCoordinates(5,12)):
-    print(c)
+minmaxState = minmax(state,3,True,'X',(state,0),(state,100))
+print(tableString(minmaxState[0]))
 
     
 
@@ -657,3 +692,4 @@ def game():
             continue     
               
 game()
+'''
