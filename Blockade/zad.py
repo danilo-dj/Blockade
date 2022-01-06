@@ -586,40 +586,42 @@ def eval_state(state):
     return randint(0,100)
 
 
-def max_value(state, depth, alpha, beta, maxplayer):
+def max_value(states, depth, alpha, beta, maxplayer):
     minplayer = 'X' if maxplayer=='O' else 'O'
-    if depth == 0 or is_end(state):
-        return (state, eval_state(state))
+    if depth == 0 or is_end(states[-1]):
+        return (states, eval_state(states[-1]))
     else:
-        for s in possibleStatesOneMove(state,maxplayer):
+        for s in possibleStatesOneMove(states[-1],maxplayer):                        
             alpha = max(alpha,
-                        min_value(s,depth-1, alpha,beta, minplayer),
+                        min_value(states + [s] ,depth-1, alpha,beta, minplayer),
                         key=lambda x: x[1])
             if alpha[1] >= beta[1]:
                 return beta
     return alpha
 
-def min_value(state,depth,alpha, beta, minplayer):
+def min_value(states,depth,alpha, beta, minplayer):
     maxplayer = 'X' if minplayer=='O' else 'O'
-    if depth == 0 or is_end(state):
-        return (state, eval_state(state))
+    if depth == 0 or is_end(states[-1]):
+        return (states, eval_state(states[-1]))
     else:
-        for s in possibleStatesOneMove(state,minplayer):
+        for s in possibleStatesOneMove(states[-1],minplayer):                       
             beta = min(beta,
-                        max_value(s, depth-1, alpha, beta, maxplayer),
+                        max_value(states + [s], depth-1, alpha, beta, maxplayer),
                         key=lambda x: x[1])
+            
             if beta[1] <= alpha[1]:
-                return alpha
+                return (s,alpha[1])
     return beta
 
 def minmax(state, depth, mymove, maxplayer, alpha=(initialState(),-1000000), beta=(initialState(),+1000000)):  #alpha beta su tuplovi (stanje, eval)
     minplayer = 'X' if maxplayer=='O' else 'O'
     if mymove:
-        return max_value(state, depth, alpha, beta, maxplayer)
+        return max_value([state], depth, alpha, beta, maxplayer)
     else:
-        return min_value(state, depth, alpha, beta, minplayer) 
+        return min_value([state], depth, alpha, beta, minplayer) 
 
 
+'''
 state = initialState()
 #state['h_walls_x']=0
 #state['v_walls_x']
@@ -629,19 +631,15 @@ state['v_walls']+=(GridCoordinates(1,5),GridCoordinates(1,8),GridCoordinates(4,8
                     GridCoordinates(8,4),GridCoordinates(9,8),GridCoordinates(7,6))
 #state['position_x']=(GridCoordinates(),GridCoordinates())
 print(tableString(state))
-minmaxState = minmax(state,3,True,'X',(state,0),(state,100))
-print(tableString(minmaxState[0]))
+minmaxStates = minmax(state,2,True,'X',(state,0),(state,100))
+for s in minmaxStates[0]:
+    print(tableString(s))
 
     
 
 
 '''
 def game():
-
-    #print('Ko je prvi na potezu?[covek,racunar](c\\r)?')
-    #a=input()
-    #print(a)
-
     print('Da li zelite da igrate sa podrazumevanom tablom?(y\\n)?')
     a = input()
     if a=='y':
@@ -667,29 +665,65 @@ def game():
         walls=int(input())    
         state = initialState(table_width,table_length,home_x,home_o,walls)
     
-    print(tableString(state))
-    
-    i=0
-    while is_end(state)==False:
-        if i%2==0:
-            print('Igrac X je na potezu!')
-        else:
-            print('Igrac O je na potezu!')
-        print('Unesi potez u formatu \n [igrac brpesaka] [korak] [vrstazid poszida] \n')        
-        move=input()
-        if re.match('\[[X] [12]\] \[[0-9][0-9]* [0-9][0-9]*\]',move) and i%2==0:
-            if makeAMoveInput(state, move):
+    print('Da li zelite da igrate protiv racunanara?(y\\n)?')
+    a=input()
+    if a=='y':
+        print('Ko je [X] prvi na potezu?[covek,racunar](c\\r)?')
+        a=input()
+        print(tableString(state))
+        i=0
+        while is_end(state)==False:
+            if i%2==0:
+                print('Igrac X je na potezu!')
+            else:
+                print('Igrac O je na potezu!')
+            if a=='r' and i%2==0:
+                state=minmax(state,2,True,'X')[0][1]
+                print(tableString(state))
                 i+=1
-            print(tableString(state))
-        elif re.match('\[[O] [12]\] \[[0-9][0-9]* [0-9][0-9]*\]',move) and i%2!=0:
-            if makeAMoveInput(state, move):
+            if a=='c' and i%2==1:
+                state=minmax(state,2,True,'O')[0][1]
+                print(tableString(state))
                 i+=1
-            print(tableString(state))
-        elif re.match('quit',move):
-            break
-        else:
-            print(tableString(state))
-            continue     
+            if (a=='c' and i%2==0) or (a=='r' and i%2==1):
+                print('Unesi potez u formatu \n [igrac brpesaka] [korak] [vrstazid poszida] \n')        
+                move=input()
+                if re.match('\[[X] [12]\] \[[0-9][0-9]* [0-9][0-9]*\]',move) and i%2==0:
+                    if makeAMoveInput(state, move):
+                        i+=1
+                    print(tableString(state))
+                elif re.match('\[[O] [12]\] \[[0-9][0-9]* [0-9][0-9]*\]',move) and i%2!=0:
+                    if makeAMoveInput(state, move):
+                        i+=1
+                    print(tableString(state))
+                elif re.match('quit',move):
+                    break
+                else:
+                    print(tableString(state))
+                    continue
+
+    elif a=='n':
+        print(tableString(state))    
+        i=0
+        while is_end(state)==False:
+            if i%2==0:
+                print('Igrac X je na potezu!')
+            else:
+                print('Igrac O je na potezu!')
+            print('Unesi potez u formatu \n [igrac brpesaka] [korak] [vrstazid poszida] \n')        
+            move=input()
+            if re.match('\[[X] [12]\] \[[0-9][0-9]* [0-9][0-9]*\]',move) and i%2==0:
+                if makeAMoveInput(state, move):
+                    i+=1
+                print(tableString(state))
+            elif re.match('\[[O] [12]\] \[[0-9][0-9]* [0-9][0-9]*\]',move) and i%2!=0:
+                if makeAMoveInput(state, move):
+                    i+=1
+                print(tableString(state))
+            elif re.match('quit',move):
+                break
+            else:
+                print(tableString(state))
+                continue     
               
 game()
-'''
