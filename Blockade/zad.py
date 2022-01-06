@@ -582,13 +582,13 @@ def pathAstar(state, pawn_pos, home):
     else:
         return False 
 
-def eval_state(state):
+def eval_state(state,player):
     return randint(0,100)
 
 
 def max_value(states, depth, alpha, beta, maxplayer):
     minplayer = 'X' if maxplayer=='O' else 'O'
-    if depth == 0 or is_end(states[-1]):
+    if depth == 0 or is_end(states[-1], maxplayer):
         return (states, eval_state(states[-1]))
     else:
         for s in possibleStatesOneMove(states[-1],maxplayer):                        
@@ -601,8 +601,8 @@ def max_value(states, depth, alpha, beta, maxplayer):
 
 def min_value(states,depth,alpha, beta, minplayer):
     maxplayer = 'X' if minplayer=='O' else 'O'
-    if depth == 0 or is_end(states[-1]):
-        return (states, eval_state(states[-1]))
+    if depth == 0:
+        return (states, eval_state(states[-1], minplayer))
     else:
         for s in possibleStatesOneMove(states[-1],minplayer):                       
             beta = min(beta,
