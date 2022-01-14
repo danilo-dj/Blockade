@@ -154,7 +154,7 @@ def getValidMoves(state,pawn): #[X 1] [6 3] [V 4 9] stanje i poziciju pesaka
     #ako postoji pesak na possible_moves    
     for pm in possible_moves.copy():
         if pm in state['position_o'] or pm in state['position_x']:
-            p=pm in state['position_o'] or pm in state['position_x']
+            minpenemy=pm in state['position_o'] or pm in state['position_x']
             if pm not in state['home_x'] and pm not in state['home_o']:
                 c=pm not in state['home_x'] and pm not in state['home_o']
                 possible_moves.remove(pm)
@@ -233,6 +233,12 @@ def getValidMoves(state,pawn): #[X 1] [6 3] [V 4 9] stanje i poziciju pesaka
     if pawn.left() in state['h_walls'] and pawn.right() in state['h_walls']:
         possible_moves-={pawn.bottom().right()}
 
+    for p in possible_moves.copy():
+        if p.row>state['table_length'] or p.row<1:
+            possible_moves-={p}
+        if p.col>state['table_width'] or p.col<1:
+            possible_moves-={p}
+
     return possible_moves
 
 def checkPositionForWall (state, position, wall): # 'V' 'H'
@@ -263,6 +269,8 @@ def checkPositionForWall (state, position, wall): # 'V' 'H'
     return True
 
 def addWall(state,wall_coor,wall_kind,pawn):
+    if(wall_coor.row<1 or wall_coor.col<1 or wall_coor.row>state['table_length'] or wall_coor.col>state['table_width']):
+        return False
     if checkPositionForWall(state,wall_coor,wall_kind):
         if wall_kind=='H':
             if re.match('X[12]',pawn):
@@ -359,13 +367,23 @@ def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
     wallrow=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VHX] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(3)
     wallcol=re.search('\[([0-9][0-9]*) ([0-9][0-9]*)\] \[[VHX] ([0-9][0-9]*) ([0-9][0-9]*)\]', move).group(4)
     
-    p=re.search('\[([XO]) ([0-9][0-9]*)\]', move).group(1)
+    minpenemy=re.search('\[([XO]) ([0-9][0-9]*)\]', move).group(1)
     n=re.search('\[([XO]) ([0-9][0-9]*)\]', move).group(2)          
 
-    pawn=p+n
+    pawn=minpenemy+n
     step=GridCoordinates(int(steprow), int(stepcol))
     wall_kind=re.search('\[([VHX]) [0-9][0-9]* [0-9][0-9]*\]', move).group(1)
-    wall_coor=GridCoordinates(int(wallrow),int(wallcol))       
+    wall_coor=GridCoordinates(int(wallrow),int(wallcol)) 
+
+    #pomeranje pesaka
+    switcher = {
+        'X1': state['position_x'][0],
+        'X2': state['position_x'][1],
+        'O1': state['position_o'][0],
+        'O2': state['position_o'][1] 
+    }
+    pawn_pos = switcher[pawn]
+    validMoves = getValidMoves(state,pawn_pos)     
 
     #postavljanje i provera zida
 
@@ -376,6 +394,7 @@ def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
                     if pathAstar(state,px,ho)==False:
                         removeWall(state,wall_coor,wall_kind,pawn)
                         print('Zid iskljucuje put do kuce')
+                        switcher[pawn]=pawn_pos 
                         return False                        
                 else:                    
                     continue
@@ -385,31 +404,20 @@ def makeAMove(state, move): #[X 1] [6 3] [V 4 9]
                     if pathAstar(state,po,hx)==False:
                         removeWall(state,wall_coor,wall_kind,pawn)
                         print('Zid iskljucuje put do kuce')
+                        switcher[pawn]=pawn_pos 
                         return False
                 else:
                     continue
                 
-    else:        
-        return False        
-
-    #pomeranje pesaka
-    switcher = {
-        'X1': state['position_x'][0],
-        'X2': state['position_x'][1],
-        'O1': state['position_o'][0],
-        'O2': state['position_o'][1] 
-    }
-                                            
-    pawn_pos = switcher[pawn]
-
-    validMoves = getValidMoves(state,pawn_pos)
-
+    else:             
+        return False
+    
     if step in validMoves:
         switcher[pawn].set(step.row,step.col)
     else:
-        print(f'Korak pesaka {pawn} nije validan')
-        removeWall(state, wall_coor, wall_kind, pawn)
+        print(f'Korak pesaka {pawn} nije validan')        
         return False
+   
     print('Izvrsen je potez:'+move)
     return True
 
@@ -447,8 +455,7 @@ def newState(state, move):
 
 def possibleStatesOneMove(state, player): # 'X' ili 'O'    
               
-    #najkraci putevi
-    
+    #najkraci putevi    
     lpX=list()
     lpO=list()
     for ho in state['home_o']:
@@ -464,25 +471,58 @@ def possibleStatesOneMove(state, player): # 'X' ili 'O'
                 lpO.append((path, i+1, len(path)))
     if player == 'X':
         minpath = min(lpX, key=lambda x: x[2])
-        minenemy= min(lpO, key=lambda x: x[2])       
+        minpenemy= min(lpO, key=lambda x: x[2]) 
+        lpO.remove(minpenemy)              
         hwLeft=state['h_walls_x']
         vwLeft=state['v_walls_x']
     if player == 'O':
         minpath = min(lpO, key=lambda x: x[2])
-        minenemy = min(lpX, key=lambda x: x[2])
+        minpenemy = min(lpX, key=lambda x: x[2])
+        lpX.remove(minpenemy)
         hwLeft=state['h_walls_o']
         vwLeft=state['v_walls_o']
 
-    possibleStates = list()
-    for pos in minenemy[0]:
-        if hwLeft>0:                        
-            possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {pos[0].row} {pos[0].col}]"))
-        if vwLeft>0:
-            possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {pos[0].row} {pos[0].col}]"))
-        if hwLeft==0 and vwLeft==0:
+    possibleStates = list()   
+   
+    i=1
+    while( len(possibleStates) < 2 and i<=len(minpenemy[0])):
+        if( i == len(minpenemy[0])):
+            if player=='X':
+                minpenemy= min(lpO, key=lambda x: x[2]) 
+                lpO.remove(minpenemy)
+            if player=='O':
+                minpenemy= min(lpX, key=lambda x: x[2]) 
+                lpX.remove(minpenemy)
+            continue
+        if hwLeft > 0:
+            if minpenemy[0][-i-1][0].row < minpenemy[0][-i][0].row:
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][-i-1][0].row} {minpenemy[0][-i-1][0].col}]"))
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][-i-1][0].left().row} {minpenemy[0][-i-1][0].left().col}]"))
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][-i-1][0].left().left().row} {minpenemy[0][-i-1][0].left().left().col}]"))
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][-i-1][0].right().row} {minpenemy[0][-i-1][0].right().col}]"))
+            if minpenemy[0][-i-1][0].row > minpenemy[0][-i][0].row:
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][-i-1][0].top().row} {minpenemy[0][-i-1][0].top().col}]"))
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][-i-1][0].top().left().row} {minpenemy[0][-i-1][0].top().left().col}]"))
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][-i-1][0].top().left().left().row} {minpenemy[0][-i-1][0].top().left().left().col}]"))
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][-i-1][0].top().right().row} {minpenemy[0][-i-1][0].top().right().col}]"))      
+        if vwLeft > 0:
+            if minpenemy[0][-i-1][0].col < minpenemy[0][-i][0].col:
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][-i-1][0].top().row} {minpenemy[0][-i-1][0].top().col}]"))
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][-i-1][0].row} {minpenemy[0][-i-1][0].col}]"))
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][-i-1][0].top().top().row} {minpenemy[0][-i-1][0].top().top().col}]"))
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][-i-1][0].bottom().row} {minpenemy[0][-i-1][0].bottom().col}]"))
+            if minpenemy[0][-i-1][0].col > minpenemy[0][-i][0].col:
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][-i-1][0].top().left().row} {minpenemy[0][-i-1][0].top().left().col}]"))
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][-i-1][0].left().row} {minpenemy[0][-i-1][0].left().col}]"))
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][-i-1][0].top().top().left().row} {minpenemy[0][-i-1][0].top().top().left().col}]"))
+                possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][-i-1][0].bottom().left().row} {minpenemy[0][-i-1][0].bottom().left().col}]"))
+        possibleStates = list(filter(lambda x: x != None,possibleStates))
+        i+=1
+    
+    if hwLeft==0 and vwLeft==0:
             possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}]"))
    
-    return list(filter(lambda x: x != None,possibleStates))
+    return possibleStates
 
 def isTouchingTwoWalls(state, position):    # da li wall na pos dodiruje dva zida
     #moguce pozicije dodirnih zidova    
@@ -602,14 +642,28 @@ def pathAstar(state, pawn_pos, home):
     else:
         return False 
 
-def eval_state(state,player):        
-    return randint(0,100)
-
+def eval_state(state,max):
+    homes=state['home_o']+state['home_x']
+    pawns=state['position_x']+state['position_o']
+    sumdistance = 0
+    for h in homes:
+        for p in pawns:
+            sumdistance+=abs(p.row-h.row)**2+abs(p.col-h.col)**2
+    if(max):
+        if is_end(state):
+            return 1000
+        else:            
+            return 1000-sumdistance            
+    else:
+        if is_end(state):
+            return -1000
+        else:
+            return -(1000-sumdistance) 
 
 def max_value(states, depth, alpha, beta, maxplayer):
     minplayer = 'X' if maxplayer=='O' else 'O'
-    if depth == 0:
-        return (states, eval_state(states[-1], maxplayer))
+    if depth == 0 or is_end(states[-1]):
+        return (states, eval_state(states[-1], True))
     else:
         for s in possibleStatesOneMove(states[-1],maxplayer):                        
             alpha = max(alpha,
@@ -621,8 +675,8 @@ def max_value(states, depth, alpha, beta, maxplayer):
 
 def min_value(states,depth,alpha, beta, minplayer):
     maxplayer = 'X' if minplayer=='O' else 'O'
-    if depth == 0:
-        return (states, eval_state(states[-1], minplayer))
+    if depth == 0 or is_end(states[-1]):
+        return (states, eval_state(states[-1], False))
     else:
         for s in possibleStatesOneMove(states[-1],minplayer):                       
             beta = min(beta,
@@ -638,52 +692,36 @@ def minmax(state, depth, mymove, maxplayer, alpha=(initialState(),-1000000), bet
     if mymove:
         return max_value([state], depth, alpha, beta, maxplayer)
     else:
-        return min_value([state], depth, alpha, beta, minplayer) 
+        return min_value([state], depth, alpha, beta, minplayer)
 
 
-'''
-state = initialState()
-#state['h_walls_x']=0
-#state['v_walls_x']
-state['h_walls']+=(GridCoordinates(7,9),GridCoordinates(3,6),GridCoordinates(2,4),GridCoordinates(3,10),GridCoordinates(5,10),GridCoordinates(7,11),
-                    GridCoordinates(7,13),GridCoordinates(4,5),GridCoordinates(6,7))
-state['v_walls']+=(GridCoordinates(1,5),GridCoordinates(1,8),GridCoordinates(4,8),GridCoordinates(4,11),GridCoordinates(8,10),GridCoordinates(6,4),
-                    GridCoordinates(8,4),GridCoordinates(9,8),GridCoordinates(7,6))
-#state['position_x']=(GridCoordinates(),GridCoordinates())
-print(tableString(state))
-minmaxStates = minmax(state,2,True,'X',(state,0),(state,100))
-for s in minmaxStates[0]:
-    print(tableString(s))
-
-    
-
-
-'''
 def game():
-    print('Da li zelite da igrate sa podrazumevanom tablom?(y\\n)?')
-    a = input()
-    if a=='y':
-        state = initialState()
-    if a=='n':
-        print('Unesi sirinu table paran broj do 28')
-        table_width = int(input())
-        print('Unesi duzinu table neparan broj do 21')
-        table_length = int(input())
-        print('Unesi pocetne pozicije za X')
-        home_x=()
-        for i in range(2):
-            row=int(input())
-            col=int(input())
-            home_x+=(GridCoordinates(row,col),)
-        print('Unesi pocetne pozicije za O')
-        home_o=()
-        for i in range(2):
-            row=int(input())
-            col=int(input())
-            home_o+=(GridCoordinates(row,col),)
-        print('Unesi broj zidova svakog tipa po igracu max 18')
-        walls=int(input())    
-        state = initialState(table_width,table_length,home_x,home_o,walls)
+    a=None
+    while(a != 'n' and a != 'y'):
+        print('Da li zelite da igrate sa podrazumevanom tablom?(y\\n)?')    
+        a = input()
+        if a=='y':
+            state = initialState()
+        if a=='n':
+            print('Unesi sirinu table paran broj do 28')
+            table_width = int(input())
+            print('Unesi duzinu table neparan broj do 21')
+            table_length = int(input())
+            print('Unesi pocetne pozicije za X')
+            home_x=()
+            for i in range(2):
+                row=int(input())
+                col=int(input())
+                home_x+=(GridCoordinates(row,col),)
+            print('Unesi pocetne pozicije za O')
+            home_o=()
+            for i in range(2):
+                row=int(input())
+                col=int(input())
+                home_o+=(GridCoordinates(row,col),)
+            print('Unesi broj zidova svakog tipa po igracu max 18')
+            walls=int(input())    
+            state = initialState(table_width,table_length,home_x,home_o,walls)
     
     print('Da li zelite da igrate protiv racunanara?(y\\n)?')
     a=input()
@@ -698,11 +736,11 @@ def game():
             else:
                 print('Igrac O je na potezu!')
             if a=='r' and i%2==0:
-                state=minmax(state,2,True,'X')[0][1]
+                state=minmax(state,3,True,'X')[0][1]
                 print(tableString(state))
                 i+=1
             if a=='c' and i%2==1:
-                state=minmax(state,2,True,'O')[0][1]
+                state=minmax(state,3,True,'O')[0][1]
                 print(tableString(state))
                 i+=1
             if (a=='c' and i%2==0) or (a=='r' and i%2==1):
@@ -745,5 +783,26 @@ def game():
             else:
                 print(tableString(state))
                 continue     
-              
+
+           
 game()
+
+'''
+#[O 2] [3 2] [V 6 7]
+state = initialState()
+state['h_walls_x']=5
+state['v_walls_x']=5
+state['h_walls_o']=6
+state['h_walls']+=(GridCoordinates(7,5),GridCoordinates(3,11))
+state['v_walls']+=(GridCoordinates(3,5),GridCoordinates(8,5),GridCoordinates(4,10),GridCoordinates(6,10))
+state['position_x']=(GridCoordinates(6,8),GridCoordinates(8,4))
+state['position_o']=(GridCoordinates(4,11),GridCoordinates(7,6))
+print(tableString(state))
+
+
+minmaxStates = minmax(state,3,True,'X',(state,0),(state,100))
+
+for s in minmaxStates[0]:
+    print(tableString(s))
+ ''' 
+
