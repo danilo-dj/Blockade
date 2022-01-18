@@ -23,7 +23,7 @@ def initialState(
         'v_walls_x' : copy(walls),
         'v_walls_o' : walls,
         'h_walls': (),
-        'v_walls': ()
+        'v_walls':()
     }
     return state
 
@@ -539,9 +539,11 @@ def possibleStatesOneMove(state, player): # 'X' ili 'O'
             continue
         elif i==j:
             if player=='X':
+                if(len(lpO)==0): break
                 minpenemy= min(lpO, key=lambda x: x[2]) 
                 lpO.remove(minpenemy)
             if player=='O':
+                if(len(lpX)==0): break
                 minpenemy= min(lpX, key=lambda x: x[2]) 
                 lpX.remove(minpenemy)
             i=1
