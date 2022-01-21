@@ -484,75 +484,74 @@ def possibleStatesOneMove(state, player): # 'X' ili 'O'
         hwLeft=state['h_walls_o']
         vwLeft=state['v_walls_o']
 
-    possibleStates = list()   
-    j=len(minpenemy[0])-1
-    i=1
-    while( len(possibleStates) < 2 ):
-
-        if hwLeft > 0:
-            if minpenemy[0][i-1][0].row < minpenemy[0][i][0].row:
-                if minpenemy[0][i-1][0].col >= minpenemy[0][i][0].col:                               
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].row} {minpenemy[0][i-1][0].col}]"))
-                if minpenemy[0][i-1][0].col > minpenemy[0][i][0].col:    
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].right().row} {minpenemy[0][i-1][0].right().col}]"))
-                if minpenemy[0][i-1][0].col <= minpenemy[0][i][0].col:
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].left().row} {minpenemy[0][i-1][0].left().col}]"))
-                if minpenemy[0][i-1][0].col < minpenemy[0][i][0].col:    
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].left().left().row} {minpenemy[0][i-1][0].left().left().col}]"))
-            if minpenemy[0][i-1][0].row > minpenemy[0][i][0].row:
-                if minpenemy[0][i-1][0].col >= minpenemy[0][i][0].col: 
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].top().row} {minpenemy[0][i-1][0].top().col}]"))
-                if minpenemy[0][i-1][0].col > minpenemy[0][i][0].col:    
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].top().right().row} {minpenemy[0][i-1][0].top().right().col}]"))      
-                if minpenemy[0][i-1][0].col <= minpenemy[0][i][0].col:    
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].top().left().row} {minpenemy[0][i-1][0].top().left().col}]"))
-                if minpenemy[0][i-1][0].col < minpenemy[0][i][0].col:    
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].top().left().left().row} {minpenemy[0][i-1][0].top().left().left().col}]"))
-        if vwLeft > 0:
-            if minpenemy[0][i-1][0].col < minpenemy[0][i][0].col:
-                if minpenemy[0][i-1][0].row >= minpenemy[0][i][0].row:
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].top().row} {minpenemy[0][i-1][0].top().col}]"))
-                if minpenemy[0][i-1][0].row > minpenemy[0][i][0].row:    
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].top().top().row} {minpenemy[0][i-1][0].top().top().col}]"))
-                if minpenemy[0][i-1][0].row <= minpenemy[0][i][0].row:
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].row} {minpenemy[0][i-1][0].col}]"))
-                if minpenemy[0][i-1][0].row < minpenemy[0][i][0].row:    
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].bottom().row} {minpenemy[0][i-1][0].bottom().col}]"))
-            if minpenemy[0][i-1][0].col > minpenemy[0][i][0].col:
-                if minpenemy[0][i-1][0].row >= minpenemy[0][i][0].row:
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].top().left().row} {minpenemy[0][i-1][0].top().left().col}]"))
-                if minpenemy[0][i-1][0].row > minpenemy[0][i][0].row:
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].top().top().left().row} {minpenemy[0][i-1][0].top().top().left().col}]"))
-                if minpenemy[0][i-1][0].row <= minpenemy[0][i][0].row:
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].left().row} {minpenemy[0][i-1][0].left().col}]"))
-                if minpenemy[0][i-1][0].row < minpenemy[0][i][0].row:
-                    possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].bottom().left().row} {minpenemy[0][i-1][0].bottom().left().col}]"))
-        possibleStates = list(filter(lambda x: x != None,possibleStates))
-        #zamene mesta
-        i,j = j,i
-        #naizmenicno blize kuce blize neprijatelju
-        if i>j: 
-            j+=1 
-            continue
-        elif i<j: 
-            j-=1 
-            continue
-        elif i==j:
-            if player=='X':
-                if(len(lpO)==0): break
-                minpenemy= min(lpO, key=lambda x: x[2]) 
-                lpO.remove(minpenemy)
-            if player=='O':
-                if(len(lpX)==0): break
-                minpenemy= min(lpX, key=lambda x: x[2]) 
-                lpX.remove(minpenemy)
-            i=1
-            j=len(minpenemy[0])-1
-            continue 
-
-    
+    possibleStates = list()
     if hwLeft==0 and vwLeft==0:
             possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}]"))
+    else:   
+        j=len(minpenemy[0])-1
+        i=1
+        k=0
+        while( len(possibleStates) < 2 ):
+
+            if hwLeft > 0:
+                if minpenemy[0][i-1][0].row < minpenemy[0][i][0].row:
+                    if minpenemy[0][i-1][0].col >= minpenemy[0][i][0].col:                               
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].row} {minpenemy[0][i-1][0].col}]"))
+                    if minpenemy[0][i-1][0].col > minpenemy[0][i][0].col:    
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].right().row} {minpenemy[0][i-1][0].right().col}]"))
+                    if minpenemy[0][i-1][0].col <= minpenemy[0][i][0].col:
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].left().row} {minpenemy[0][i-1][0].left().col}]"))
+                    if minpenemy[0][i-1][0].col < minpenemy[0][i][0].col:    
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].left().left().row} {minpenemy[0][i-1][0].left().left().col}]"))
+                if minpenemy[0][i-1][0].row > minpenemy[0][i][0].row:
+                    if minpenemy[0][i-1][0].col >= minpenemy[0][i][0].col: 
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].top().row} {minpenemy[0][i-1][0].top().col}]"))
+                    if minpenemy[0][i-1][0].col > minpenemy[0][i][0].col:    
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].top().right().row} {minpenemy[0][i-1][0].top().right().col}]"))      
+                    if minpenemy[0][i-1][0].col <= minpenemy[0][i][0].col:    
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].top().left().row} {minpenemy[0][i-1][0].top().left().col}]"))
+                    if minpenemy[0][i-1][0].col < minpenemy[0][i][0].col:    
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [H {minpenemy[0][i-1][0].top().left().left().row} {minpenemy[0][i-1][0].top().left().left().col}]"))
+            if vwLeft > 0:
+                if minpenemy[0][i-1][0].col < minpenemy[0][i][0].col:
+                    if minpenemy[0][i-1][0].row >= minpenemy[0][i][0].row:
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].top().row} {minpenemy[0][i-1][0].top().col}]"))
+                    if minpenemy[0][i-1][0].row > minpenemy[0][i][0].row:    
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].top().top().row} {minpenemy[0][i-1][0].top().top().col}]"))
+                    if minpenemy[0][i-1][0].row <= minpenemy[0][i][0].row:
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].row} {minpenemy[0][i-1][0].col}]"))
+                    if minpenemy[0][i-1][0].row < minpenemy[0][i][0].row:    
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].bottom().row} {minpenemy[0][i-1][0].bottom().col}]"))
+                if minpenemy[0][i-1][0].col > minpenemy[0][i][0].col:
+                    if minpenemy[0][i-1][0].row >= minpenemy[0][i][0].row:
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].top().left().row} {minpenemy[0][i-1][0].top().left().col}]"))
+                    if minpenemy[0][i-1][0].row > minpenemy[0][i][0].row:
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].top().top().left().row} {minpenemy[0][i-1][0].top().top().left().col}]"))
+                    if minpenemy[0][i-1][0].row <= minpenemy[0][i][0].row:
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].left().row} {minpenemy[0][i-1][0].left().col}]"))
+                    if minpenemy[0][i-1][0].row < minpenemy[0][i][0].row:
+                        possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].bottom().left().row} {minpenemy[0][i-1][0].bottom().left().col}]"))
+            possibleStates = list(filter(lambda x: x != None,possibleStates))
+            #zamene mesta
+            i,j = j,i
+            #naizmenicno blize kuce blize neprijatelju
+            if i>j: 
+                j+=1 
+                continue
+            elif i<j: 
+                j-=1 
+                continue
+            elif i==j:
+                if player=='X':
+                    if(k==1): break
+                    minpenemy= max(lpO, key=lambda x: x[2])                    
+                if player=='O':
+                    if(k==1): break
+                    minpenemy= max(lpX, key=lambda x: x[2])                    
+                i=1
+                j=len(minpenemy[0])-1
+                k=1
+                continue 
    
     return possibleStates
 
@@ -720,7 +719,7 @@ def max_value(states, depth, alpha, beta, maxplayer):
 
 def min_value(states,depth,alpha, beta, minplayer):
     maxplayer = 'X' if minplayer=='O' else 'O'
-    if depth == 0 or is_end(states[-1]):
+    if depth == 0:
         return (states, eval_state(states[-1], False,minplayer))
     else:
         for s in possibleStatesOneMove(states[-1],minplayer):                       
