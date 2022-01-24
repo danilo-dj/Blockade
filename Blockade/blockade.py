@@ -547,7 +547,7 @@ def possibleStatesOneMove(state, player): # 'X' ili 'O'
                         possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].left().row} {minpenemy[0][i-1][0].left().col}]"))
                     if minpenemy[0][i-1][0].row < minpenemy[0][i][0].row:
                         possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}] [V {minpenemy[0][i-1][0].bottom().left().row} {minpenemy[0][i-1][0].bottom().left().col}]"))
-            possibleStates = list(filter(lambda x: x != None,possibleStates))
+
             #zamene mesta
             i,j = j,i
             #naizmenicno blize kuce blize neprijatelju
@@ -568,7 +568,7 @@ def possibleStatesOneMove(state, player): # 'X' ili 'O'
                 j=len(minpenemy[0])-1
                 k=1
                 continue 
-   
+    possibleStates = list(filter(lambda x: x != None,possibleStates))
     return possibleStates
 
 def isTouchingTwoWalls(state, position):    # da li wall na pos dodiruje dva zida
