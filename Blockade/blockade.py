@@ -722,7 +722,7 @@ def eval_state(state,max,player):
 
 def max_value(states, depth, alpha, beta, maxplayer):
     minplayer = 'X' if maxplayer=='O' else 'O'
-    if depth == 0:
+    if depth == 0 or is_end(states[-1]):
         return (states, eval_state(states[-1], True, maxplayer))
     else:
         for s in possibleStatesOneMove(states[-1],maxplayer):                        
@@ -735,7 +735,7 @@ def max_value(states, depth, alpha, beta, maxplayer):
 
 def min_value(states,depth,alpha, beta, minplayer):
     maxplayer = 'X' if minplayer=='O' else 'O'
-    if depth == 0:
+    if depth == 0 or is_end(states[-1]):
         return (states, eval_state(states[-1], False,minplayer))
     else:
         for s in possibleStatesOneMove(states[-1],minplayer):                       
