@@ -744,7 +744,7 @@ def min_value(states,depth,alpha, beta, minplayer):
                         key=lambda x: x[1])
             
             if beta[1] <= alpha[1]:
-                return (s,alpha[1])
+                return alpha
     return beta
 
 def minmax(state, depth, mymove, maxplayer, alpha=(initialState(),-1000000), beta=(initialState(),+1000000)):  #alpha beta su tuplovi (stanje, eval)
