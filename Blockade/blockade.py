@@ -119,6 +119,15 @@ def getValidMoves(state,pawn): #[X 1] [6 3] [V 4 9] stanje i poziciju pesaka
         if pos in state['home_x'] or pos in state['home_o']:
             possible_moves.add(pos)
 
+    if pawn.row == 2:
+        possible_moves.add(pawn.top())
+    if pawn.row == state['table_length']-1:
+        possible_moves.add(pawn.bottom())
+    if pawn.col == 2:
+        possible_moves.add(pawn.left())
+    if pawn.col == state['table_width']-1:
+        possible_moves.add(pawn.right())
+
     #u slucaju da su drugi pesaci na krajnjim pozicijama moze da se pomeri za jedan korak   
 
     if pawn.top().top() in state['position_x'] or pawn.top().top() in state['position_o']:
@@ -487,10 +496,17 @@ def possibleStatesOneMove(state, player): # 'X' ili 'O'
     possibleStates = list()
     if hwLeft==0 and vwLeft==0:
             possibleStates.append(newState(state,f"[{player} {minpath[1]}] [{minpath[0][1][0].row} {minpath[0][1][0].col}]"))
-    else:   
-        j=len(minpenemy[0])-1
-        i=1
+    else:
         k=0
+        i=1
+        if len(minpenemy[0])<=1:
+            if player=='X':
+                k=1
+                minpenemy= max(lpO, key=lambda x: x[2])                    
+            if player=='O':
+                k=1
+                minpenemy= max(lpX, key=lambda x: x[2])  
+        j=len(minpenemy[0])-1                
         while( len(possibleStates) < 2 ):
 
             if hwLeft > 0:
@@ -706,7 +722,7 @@ def eval_state(state,max,player):
 
 def max_value(states, depth, alpha, beta, maxplayer):
     minplayer = 'X' if maxplayer=='O' else 'O'
-    if depth == 0 or is_end(states[-1]):
+    if depth == 0:
         return (states, eval_state(states[-1], True, maxplayer))
     else:
         for s in possibleStatesOneMove(states[-1],maxplayer):                        
